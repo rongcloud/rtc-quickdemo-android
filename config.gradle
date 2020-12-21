@@ -1,0 +1,12 @@
+ext{
+    android=[
+        compileSdkVersion : 26,
+        applicationId : "cn.rongcloud.quickdemo",
+        applicationId_PK : "cn.rongcloud.quickdemo_pk",
+        applicationId_meeting_1v1 : "cn.rongcloud.quickdemo_meeting_1v1",
+        minSdkVersion : 19,
+        targetSdkVersion : 26,
+        versionCode : 1,
+        versionName : "1.0",
+    ]
+}

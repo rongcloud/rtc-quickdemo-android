@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:orientation="vertical"
+  android:layout_height="match_parent">
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:orientation="horizontal"
+    android:weightSum="2"
+    android:layout_height="wrap_content">
+    <Button
+      android:id="@+id/btn_login1"
+      android:layout_width="0dp"
+      android:layout_weight="1"
+      android:onClick="loginClick"
+      android:layout_margin="5dp"
+      android:text="登录用户1"
+      android:layout_height="wrap_content"/>
+
+    <Button
+      android:id="@+id/btn_login2"
+      android:layout_width="0dp"
+      android:layout_weight="1"
+      android:onClick="loginClick"
+      android:layout_margin="5dp"
+      android:text="登录用户2"
+      android:layout_height="match_parent"/>
+  </LinearLayout>
+
+  <RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="50dp">
+
+    <TextView
+      android:id="@+id/tv_uid"
+      android:layout_width="wrap_content"
+      android:layout_marginLeft="15dp"
+      android:layout_alignParentLeft="true"
+      android:layout_centerVertical="true"
+      android:textColor="@color/black"
+      android:layout_height="wrap_content"/>
+
+    <TextView
+      android:id="@+id/tv_rid"
+      android:layout_width="wrap_content"
+      android:layout_toRightOf="@+id/tv_uid"
+      android:layout_marginLeft="15dp"
+      android:textColor="@color/black"
+      android:layout_centerVertical="true"
+      android:layout_height="wrap_content"/>
+
+
+    <ImageView
+      android:id="@+id/iv_back"
+      android:layout_width="wrap_content"
+      android:src="@mipmap/back"
+      android:layout_alignParentRight="true"
+      android:layout_centerVertical="true"
+      android:layout_marginRight="15dp"
+      android:onClick="click"
+      android:layout_height="wrap_content"/>
+
+  </RelativeLayout>
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:orientation="horizontal"
+    android:weightSum="2"
+    android:layout_marginTop="10dp"
+    android:background="@color/black"
+    android:layout_height="240dp">
+
+    <FrameLayout
+      android:id="@+id/frameyout_local"
+      android:layout_width="0dp"
+      android:layout_margin="10dp"
+      android:layout_weight="1"
+      android:layout_height="match_parent"/>
+
+    <FrameLayout
+      android:id="@+id/frameyout_remote"
+      android:layout_width="0dp"
+      android:layout_margin="10dp"
+      android:layout_weight="1"
+      android:layout_height="match_parent"/>
+
+  </LinearLayout>
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:orientation="horizontal"
+    android:layout_height="wrap_content">
+
+    <Button
+      android:id="@+id/btn_pk"
+      android:layout_width="wrap_content"
+      android:text="PK"
+      android:layout_margin="5dp"
+      android:onClick="click"
+      android:layout_height="wrap_content"/>
+
+    <android.support.v7.widget.AppCompatCheckBox
+      android:id="@+id/menu_mute_mic"
+      android:layout_width="36dp"
+      android:layout_height="36dp"
+      android:layout_margin="5dp"
+      android:layout_alignParentRight="true"
+      android:layout_alignParentBottom="true"
+      android:background="@drawable/selector_checkbox_mute"
+      android:button="@null"
+      android:checked="false" />
+
+    <android.support.v7.widget.AppCompatCheckBox
+      android:id="@+id/menu_close"
+      android:layout_width="36dp"
+      android:layout_height="36dp"
+      android:layout_margin="5dp"
+      android:layout_alignParentBottom="true"
+      android:background="@drawable/selector_checkbox_close_camera"
+      android:button="@null"
+      android:checked="false" />
+
+  </LinearLayout>
+
+</LinearLayout>

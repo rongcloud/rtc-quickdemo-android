@@ -1,0 +1,4 @@
+include ':quickdemo-meeting-1v1'
+include ':quickdemo-pk'
+include ':common'
+rootProject.name = "rtc-quickdemo-android"
