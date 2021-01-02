@@ -51,14 +51,14 @@
     android:layout_height="match_parent">
 
     <FrameLayout
-      android:id="@+id/frameyout_localUser"
+      android:id="@+id/local_user"
       android:layout_width="match_parent"
       android:layout_height="0dp"
       android:layout_margin="5dp"
       android:layout_weight="1"/>
 
     <FrameLayout
-      android:id="@+id/frameyout_remoteUser"
+      android:id="@+id/remote_user"
       android:layout_width="match_parent"
       android:layout_height="0dp"
       android:layout_margin="5dp"

@@ -33,18 +33,18 @@ import java.util.List;
 
 public class Meeting1V1MainActivity extends BaseActivity {
 
-    private static final String ROOMID = "112233";
+    private static final String ROOM_ID = "112233";
     private RCRTCRoom rcrtcRoom = null;
     private TextView tv_textView;
-    private FrameLayout frameyout_localUser, frameyout_remoteUser;
+    private FrameLayout localUser, remoteUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meeting1_v1_main);
         tv_textView = (TextView) findViewById(R.id.tv_textView);
-        frameyout_localUser = (FrameLayout) findViewById(R.id.frameyout_localUser);
-        frameyout_remoteUser = (FrameLayout) findViewById(R.id.frameyout_remoteUser);
+        localUser = (FrameLayout) findViewById(R.id.local_user);
+        remoteUser = (FrameLayout) findViewById(R.id.remote_user);
     }
 
     private void connect(String token) {
@@ -83,9 +83,9 @@ public class Meeting1V1MainActivity extends BaseActivity {
 
         RCRTCVideoStreamConfig.Builder videoConfigBuilder = RCRTCVideoStreamConfig.Builder.create();
         //设置分辨率
-        videoConfigBuilder.setVideoResolution(RCRTCVideoResolution.RESOLUTION_480_640);
+        videoConfigBuilder.setVideoResolution(RCRTCVideoResolution.RESOLUTION_720_1280);
         //设置帧率
-        videoConfigBuilder.setVideoFps(RCRTCVideoFps.Fps_15);
+        videoConfigBuilder.setVideoFps(RCRTCVideoFps.Fps_30);
         //设置最小码率，480P下推荐200
         videoConfigBuilder.setMinRate(200);
         //设置最大码率，480P下推荐900
@@ -97,10 +97,10 @@ public class Meeting1V1MainActivity extends BaseActivity {
         RCRTCEngine.getInstance().getDefaultVideoStream().setVideoView(rongRTCVideoView);
 
         //TODO 将本地视图添加至FrameLayout布局，需要开发者自行创建布局
-        frameyout_localUser.addView(rongRTCVideoView);
+        localUser.addView(rongRTCVideoView);
         RCRTCEngine.getInstance().getDefaultVideoStream().startCamera(null);
         //mRoomId,长度 64 个字符，可包含：`A-Z`、`a-z`、`0-9`、`+`、`=`、`-`、`_`
-        RCRTCEngine.getInstance().joinRoom(ROOMID, new IRCRTCResultDataCallback<RCRTCRoom>() {
+        RCRTCEngine.getInstance().joinRoom(ROOM_ID, new IRCRTCResultDataCallback<RCRTCRoom>() {
             @Override
             public void onSuccess(final RCRTCRoom rcrtcRoom) {
                 runOnUiThread(new Runnable() {
@@ -150,8 +150,8 @@ public class Meeting1V1MainActivity extends BaseActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        frameyout_localUser.removeAllViews();
-                        frameyout_remoteUser.removeAllViews();
+                        localUser.removeAllViews();
+                        remoteUser.removeAllViews();
                         Toast.makeText(Meeting1V1MainActivity.this, "退出成功!", Toast.LENGTH_SHORT).show();
                         setText(null);
                         rcrtcRoom = null;
@@ -232,9 +232,9 @@ public class Meeting1V1MainActivity extends BaseActivity {
                     for (RCRTCInputStream inputStream : list) {
                         if (inputStream.getMediaType() == RCRTCMediaType.VIDEO) {
                             RCRTCVideoView remoteVideoView = new RCRTCVideoView(getApplicationContext());
-                            frameyout_remoteUser.removeAllViews();
+                            remoteUser.removeAllViews();
                             //将远端视图添加至布局
-                            frameyout_remoteUser.addView(remoteVideoView);
+                            remoteUser.addView(remoteVideoView);
                             ((RCRTCVideoInputStream) inputStream).setVideoView(remoteVideoView);
                             //选择订阅大流或是小流。默认小流
                             ((RCRTCVideoInputStream) inputStream).setStreamType(RCRTCStreamType.NORMAL);
@@ -268,7 +268,7 @@ public class Meeting1V1MainActivity extends BaseActivity {
 
         @Override
         public void onRemoteUserUnpublishResource(RCRTCRemoteUser rcrtcRemoteUser, List<RCRTCInputStream> list) {
-            frameyout_remoteUser.removeAllViews();
+            remoteUser.removeAllViews();
         }
 
         /**
@@ -296,7 +296,7 @@ public class Meeting1V1MainActivity extends BaseActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    frameyout_remoteUser.removeAllViews();
+                    remoteUser.removeAllViews();
                 }
             });
         }
@@ -334,7 +334,7 @@ public class Meeting1V1MainActivity extends BaseActivity {
                     RCRTCVideoView videoView = new RCRTCVideoView(getApplicationContext());
                     ((RCRTCVideoInputStream) inputStream).setVideoView(videoView);
                     //将远端视图添加至布局
-                    frameyout_remoteUser.addView(videoView);
+                    this.remoteUser.addView(videoView);
                 }
             }
             inputStreams.addAll(remoteUser.getStreams());

@@ -85,7 +85,7 @@ public class PKMainActivity extends BaseActivity {
                 if(TextUtils.equals(text,"PK")){
                     showPKDialog();
                 }else if(TextUtils.equals(text,"结束PK")){
-                    endPK();
+                    endPK(mOtherRoom.getRoomId());
                 }
                 break;
             case R.id.iv_back:
@@ -126,7 +126,7 @@ public class PKMainActivity extends BaseActivity {
     /**
      * 结束连麦
      */
-    private void endPK(){
+    private void endPK(String roomid){
         setBtnText("PK");
         if(mOtherRoom!=null){
             /**
@@ -137,7 +137,7 @@ public class PKMainActivity extends BaseActivity {
              * @param notifyFinished 离开副房间时是否结束连麦。如果为true，本端将会退出该副房间。连麦中的其他用户将收到回调通知 {@link cn.rongcloud.rtc.api.callback.IRCRTCRoomEventsListener#onFinishOtherRoom(String, String)}
              * @group 房间管理
              */
-            RCRTCEngine.getInstance().leaveOtherRoom(mOtherRoom.getRoomId(), true, new IRCRTCResultCallback() {
+            RCRTCEngine.getInstance().leaveOtherRoom(roomid, true, new IRCRTCResultCallback() {
                 @Override
                 public void onSuccess() {
                     runOnUiThread(new Runnable() {
@@ -590,7 +590,7 @@ public class PKMainActivity extends BaseActivity {
         }
 
         /**
-         * 收到结束跨房间连麦的通知
+         * 收到结束跨房间连麦的通知，需要在此处调用 {@link RCRTCEngine#leaveOtherRoom(String, boolean, IRCRTCResultCallback)} 决定是否与对端结束连麦(停止合流)
          *
          * @param roomId 结束连麦的房间 Id
          * @param userId 发起结束连麦的用户 id
@@ -606,6 +606,7 @@ public class PKMainActivity extends BaseActivity {
                     if (frameyout_remote!=null) {
                         frameyout_remote.removeAllViews();
                     }
+                    endPK(roomId);
                 }
             });
         }
