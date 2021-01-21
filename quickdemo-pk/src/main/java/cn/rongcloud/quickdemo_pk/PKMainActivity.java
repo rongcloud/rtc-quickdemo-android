@@ -1,10 +1,8 @@
 package cn.rongcloud.quickdemo_pk;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v7.widget.AppCompatCheckBox;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,9 +14,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import cn.rongcloud.common.tools.DialogUtils;
-import cn.rongcloud.common.tools.Utils;
 import cn.rongcloud.common.view.BaseActivity;
 import cn.rongcloud.rtc.api.RCRTCConfig;
 import cn.rongcloud.rtc.api.RCRTCEngine;
@@ -40,12 +36,23 @@ import cn.rongcloud.rtc.base.RCRTCParamsType.RCRTCVideoFps;
 import cn.rongcloud.rtc.base.RCRTCParamsType.RCRTCVideoResolution;
 import cn.rongcloud.rtc.base.RCRTCRoomType;
 import cn.rongcloud.rtc.base.RTCErrorCode;
-import io.rong.imlib.RongIMClient;
-import io.rong.imlib.RongIMClient.DatabaseOpenStatus;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * todo 跨房间连麦文档：https://docs.rongcloud.cn/v4/views/rtc/livevideo/guide/joinManage/joinAcross/android.html
+ * 直播跨房间连麦代码流程：
+ * 1. 初始化IM，本Demo在common/src/main/java/cn/rongcloud/common/MyApplication.java类中
+ * 2. 登录IM，{@link BaseActivity#connectIM(String) }
+ * 3. 登录成功后加入RTC主房间，{@link PKMainActivity#joinRTCRoom()}
+ * 4. 加入房间成功后，可以发布资源mainRoom.getLocalUser().publishDefaultLiveStreams 和订阅等操作；
+ * 5. 使用{@link PKMainActivity#invite(String, String) } 发起连麦请求；
+ * 6. 在 {@link IRCRTCRoomEventsListener#onResponseJoinOtherRoom } 等待对方响应连麦请求
+ * 7. 对方同意后，加其他房间 {@link PKMainActivity#joinOtherRoom(String)} ，加入成功后，调用主房间对象方法订阅其他房间中用户的流(mainRoom.getLocalUser().subscribeStreams)
+ * 8. 结束连麦 {@link PKMainActivity#endPK(String)}
+ * 9. 离开主房间 {@link PKMainActivity#leaveMainRoom()}
+ */
 public class PKMainActivity extends BaseActivity {
 
     TextView tv_uid, tv_roomId;
@@ -56,27 +63,34 @@ public class PKMainActivity extends BaseActivity {
     private Dialog dialog;
     private LayoutInflater inflater;
     private EditText editText_roomid,editText_userId;
-    private AppCompatCheckBox btnMuteMic,menu_close;
+    private CheckBox btnMuteMic,menu_close;
     //
     private FrameLayout frameyout_local,frameyout_remote;
-    private Button btn_pk,btn_login1,btn_login2;
+    private Button btn_pk;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_p_k_main);
+        setLayout(R.layout.activity_p_k_main);
         tv_uid=findViewById(R.id.tv_uid);
         tv_roomId =findViewById(R.id.tv_rid);
         frameyout_local=findViewById(R.id.frameyout_local);
         frameyout_remote=findViewById(R.id.frameyout_remote);
         menu_close=findViewById(R.id.menu_close);
-        btnMuteMic = (AppCompatCheckBox) findViewById(R.id.menu_mute_mic);
+        btnMuteMic = (CheckBox) findViewById(R.id.menu_mute_mic);
         menu_close.setOnClickListener(clickListener);
         btnMuteMic.setOnClickListener(clickListener);
         btn_pk=findViewById(R.id.btn_pk);
-        btn_login1=findViewById(R.id.btn_login1);
-        btn_login2=findViewById(R.id.btn_login2);
     }
+
+    @Override
+    public void IMConnectSuccess(String userId) {
+        tv_uid.setText("UserId : "+userId);
+        joinRTCRoom();
+    }
+
+    @Override
+    public void IMConnectError() {}
 
     public void click(View view){
         switch (view.getId()){
@@ -352,45 +366,6 @@ public class PKMainActivity extends BaseActivity {
                 }
             });
         }
-    }
-
-    private void connectIM(String token) {
-        if (RongIMClient.getInstance().getCurrentConnectionStatus() == RongIMClient.ConnectionStatusListener.ConnectionStatus.CONNECTED) {
-            joinRTCRoom();
-            return;
-        }
-        /**
-         * 连接融云服务器，在整个应用程序全局，只需要调用一次，需在 {@link #init(Context, String)} 之后调用。
-         * </p>
-         * 如果调用此接口遇到连接失败，SDK 会自动启动重连机制进行最多10次重连，分别是1, 2, 4, 8, 16, 32, 64, 128, 256, 512秒后。
-         * 在这之后如果仍没有连接成功，还会在当检测到设备网络状态变化时再次进行重连。
-         *
-         * @param token    从服务端获取的用户身份令牌（Token）
-         * @param callback 连接回调
-         */
-        RongIMClient.connect(token, new RongIMClient.ConnectCallback() {
-
-            @Override
-            public void onSuccess(String s) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        tv_uid.setText("UserId : "+s);
-                        joinRTCRoom();
-                    }
-                });
-            }
-
-            @Override
-            public void onError(RongIMClient.ConnectionErrorCode errorCode) {
-                showToast("IM 连接失败 ："+errorCode);
-            }
-
-            @Override
-            public void onDatabaseOpened(DatabaseOpenStatus databaseOpenStatus) {
-
-            }
-        });
     }
 
     private void joinRTCRoom() {
@@ -734,15 +709,6 @@ public class PKMainActivity extends BaseActivity {
         }
     };
 
-    private void showToast(String msg){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(PKMainActivity.this, msg, Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
     /**
      * 显示邀请跨房间PK弹窗
      */
@@ -837,17 +803,5 @@ public class PKMainActivity extends BaseActivity {
     }
     private void setBtnText(String str){
         btn_pk.setText(str);
-    }
-    public  void loginClick(View view){
-        switch (view.getId()){
-            case R.id.btn_login1:
-                connectIM(Utils.USER_1);
-                btn_login2.setVisibility(View.INVISIBLE);
-                break;
-            case R.id.btn_login2:
-                connectIM(Utils.USER_2);
-                btn_login1.setVisibility(View.INVISIBLE);
-                break;
-        }
     }
 }

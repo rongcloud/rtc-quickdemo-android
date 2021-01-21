@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:orientation="vertical">
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+      android:layout_width="match_parent"
+      android:layout_height="50dp">
+
+      <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:textSize="16sp"
+        android:layout_centerInParent="true"
+        android:textColor="@color/black"
+        android:layout_height="wrap_content"/>
+
+    </RelativeLayout>
+
+    <LinearLayout
+      android:id="@+id/linear_videoView_manager"
+      android:layout_width="match_parent"
+      android:orientation="horizontal"
+      android:layout_height="wrap_content"/>
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:orientation="horizontal"
+      android:layout_height="wrap_content">
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:textSize="13sp"
+        android:layout_marginLeft="15dp"
+        android:textColor="@color/gray"
+        android:ellipsize="end"
+        android:lines="1"
+        android:text="LiveUrl ："
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="2dp"
+        android:layout_height="wrap_content"/>
+
+      <TextView
+        android:id="@+id/tv_liveUrl"
+        android:layout_width="wrap_content"
+        android:textSize="13sp"
+        android:textColor="@color/gray"
+        android:ellipsize="end"
+        android:lines="1"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="2dp"
+        android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:weightSum="4"
+      android:orientation="horizontal"
+      android:layout_height="wrap_content">
+
+      <Button
+        android:id="@+id/btn_login_a"
+        android:onClick="onClick"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:textColor="@color/white"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginBottom="3dp"
+        android:layout_marginRight="5dp"
+        android:background="@drawable/shape_corner_button_blue"
+        android:text="用户A"
+        android:layout_height="wrap_content"/>
+
+      <Button
+        android:id="@+id/btn_login_b"
+        android:onClick="onClick"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_marginRight="5dp"
+        android:textColor="@color/white"
+        android:layout_marginTop="3dp"
+        android:layout_marginBottom="3dp"
+        android:background="@drawable/shape_corner_button_blue"
+        android:text="用户B"
+        android:layout_height="wrap_content"/>
+
+      <Button
+        android:id="@+id/btn_login_c"
+        android:onClick="onClick"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:textColor="@color/white"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginBottom="3dp"
+        android:background="@drawable/shape_corner_button_blue"
+        android:text="用户C"
+        android:layout_height="wrap_content"/>
+
+      <Button
+        android:id="@+id/btn_login_d"
+        android:onClick="onClick"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:textColor="@color/white"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginBottom="3dp"
+        android:background="@drawable/shape_corner_button_blue"
+        android:text="用户D"
+        android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:orientation="horizontal"
+      android:weightSum="3"
+      android:layout_height="wrap_content">
+
+      <Button
+        android:id="@+id/btn_joinRoom"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:background="@drawable/shape_corner_button_blue"
+        android:onClick="onClick"
+        android:text="开始直播"
+        android:layout_marginTop="3dp"
+        android:layout_marginBottom="3dp"
+        android:textColor="@color/white" />
+
+      <Button
+        android:id="@+id/btn_subscribeLiveStream"
+        android:onClick="onClick"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:textColor="@color/white"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginBottom="3dp"
+        android:background="@drawable/shape_corner_button_blue"
+        android:text="观看直播"
+        android:layout_height="wrap_content"/>
+
+      <Button
+        android:id="@+id/btn_viewerJoin"
+        android:onClick="onClick"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:textColor="@color/white"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginBottom="3dp"
+        android:background="@drawable/shape_corner_button_blue"
+        android:text="上麦"
+        android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:orientation="horizontal"
+    android:weightSum="2"
+    android:layout_height="wrap_content">
+
+    <Button
+      android:id="@+id/btn_camera"
+      android:onClick="onClick"
+      android:layout_width="0dp"
+      android:layout_weight="1"
+      android:textColor="@color/white"
+      android:layout_marginTop="3dp"
+      android:layout_marginBottom="3dp"
+      android:layout_marginLeft="5dp"
+      android:layout_marginRight="5dp"
+      android:background="@drawable/shape_corner_button_blue"
+      android:text="关闭摄像头"
+      android:layout_height="wrap_content"/>
+
+    <Button
+      android:id="@+id/btn_mic"
+      android:onClick="onClick"
+      android:layout_width="0dp"
+      android:layout_weight="1"
+      android:textColor="@color/white"
+      android:layout_marginTop="3dp"
+      android:layout_marginBottom="3dp"
+      android:layout_marginRight="5dp"
+      android:background="@drawable/shape_corner_button_blue"
+      android:text="关闭麦克风"
+      android:layout_height="wrap_content"/>
+  </LinearLayout>
+
+
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:orientation="horizontal"
+      android:weightSum="2"
+      android:layout_height="wrap_content">
+
+      <Button
+        android:id="@+id/btn_layout"
+        android:onClick="onClick"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:textColor="@color/white"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginBottom="3dp"
+        android:background="@drawable/shape_corner_button_blue"
+        android:layout_marginLeft="5dp"
+        android:text="自适应布局"
+        android:layout_height="wrap_content"/>
+
+      <Button
+        android:id="@+id/btn_sendMessage"
+        android:onClick="onClick"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:textColor="@color/white"
+        android:layout_marginTop="3dp"
+        android:layout_marginBottom="3dp"
+        android:layout_marginRight="5dp"
+        android:background="@drawable/shape_corner_button_blue"
+        android:text="发送直播地址"
+        android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+  </LinearLayout>
+</ScrollView>

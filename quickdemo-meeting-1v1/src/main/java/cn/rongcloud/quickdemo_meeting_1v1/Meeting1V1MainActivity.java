@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import cn.rongcloud.common.tools.Utils;
 import cn.rongcloud.common.view.BaseActivity;
 import cn.rongcloud.rtc.api.RCRTCConfig.Builder;
 import cn.rongcloud.rtc.api.RCRTCEngine;
@@ -24,13 +23,19 @@ import cn.rongcloud.rtc.base.RCRTCParamsType.RCRTCVideoFps;
 import cn.rongcloud.rtc.base.RCRTCParamsType.RCRTCVideoResolution;
 import cn.rongcloud.rtc.base.RCRTCStreamType;
 import cn.rongcloud.rtc.base.RTCErrorCode;
-import io.rong.imlib.RongIMClient;
-import io.rong.imlib.RongIMClient.ConnectCallback;
-import io.rong.imlib.RongIMClient.ConnectionErrorCode;
-import io.rong.imlib.RongIMClient.DatabaseOpenStatus;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 音视频会议代码流程：
+ * 1. 初始化IM，本Demo在common/src/main/java/cn/rongcloud/common/MyApplication.java类中
+ * 2. 登录IM，{@link BaseActivity#connectIM(String) }
+ * 3. 登录成功后加入RTC房间，{@link Meeting1V1MainActivity#joinRoom()}
+ * 4. 加入房间成功后 ，发布资源{@link Meeting1V1MainActivity#publishDefaultAVStream(RCRTCRoom)}
+ * 5. 订阅加入该房间的人员：IRCRTCRoomEventsListener#onRemoteUserPublishResource
+ * 5.1. 加入该房间时，房间中已经存在人员的订阅方法为：{@link Meeting1V1MainActivity#subscribeAVStream(RCRTCRoom)}
+ * 6. 离开房间，{@link Meeting1V1MainActivity#leaveRoom()}
+ */
 public class Meeting1V1MainActivity extends BaseActivity {
 
     private static final String ROOM_ID = "112233";
@@ -41,39 +46,24 @@ public class Meeting1V1MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_meeting1_v1_main);
+        setLayout(R.layout.activity_meeting1_v1_main);
         tv_textView = (TextView) findViewById(R.id.tv_textView);
         localUser = (FrameLayout) findViewById(R.id.local_user);
         remoteUser = (FrameLayout) findViewById(R.id.remote_user);
     }
 
-    private void connect(String token) {
-        if (RongIMClient.getInstance().getCurrentConnectionStatus() == RongIMClient.ConnectionStatusListener.ConnectionStatus.CONNECTED) {
-            joinRoom();
-            return;
-        }
-        RongIMClient.connect(token, new ConnectCallback() {
-            @Override
-            public void onSuccess(String userid) {
-                setText("登录成功");
-                joinRoom();
-            }
-
-            @Override
-            public void onError(ConnectionErrorCode connectionErrorCode) {
-                setText("登录 IM 失败 ：" + connectionErrorCode.name());
-            }
-
-            @Override
-            public void onDatabaseOpened(DatabaseOpenStatus databaseOpenStatus) {
-
-            }
-        });
+    @Override
+    public void IMConnectSuccess(String userId) {
+        setText("登录成功");
+        joinRoom();
     }
 
+    @Override
+    public void IMConnectError() {
+        setText("登录 IM 失败");
+    }
 
     private void joinRoom() {
-
         Builder configBuilder = Builder.create();
         //是否硬解码
         configBuilder.enableHardwareDecoder(true);
@@ -109,8 +99,6 @@ public class Meeting1V1MainActivity extends BaseActivity {
                         setText("加入房间成功");
                         Meeting1V1MainActivity.this.rcrtcRoom = rcrtcRoom;
                         rcrtcRoom.registerRoomListener(roomEventsListener);
-                        //加入房间成功后，开启摄像头采集视频数据
-//        RongRTCCapture.getInstance().startCameraCapture();
                         //加入房间成功后，发布默认音视频流
                         publishDefaultAVStream(rcrtcRoom);
                         //加入房间成功后，如果房间中已存在用户且发布了音、视频流，就订阅远端用户发布的音视频流.
@@ -143,7 +131,9 @@ public class Meeting1V1MainActivity extends BaseActivity {
         });
     }
 
+    //房间管理文档：https://docs.rongcloud.cn/v4/views/rtc/meeting/guide/room/android.html
     private void leaveRoom() {
+        rcrtcRoom.unregisterRoomListener();
         RCRTCEngine.getInstance().leaveRoom(new IRCRTCResultCallback() {
             @Override
             public void onSuccess() {
@@ -168,14 +158,6 @@ public class Meeting1V1MainActivity extends BaseActivity {
 
     public void click(View view) {
         switch (view.getId()) {
-            case R.id.btn_user1:
-                setText("当前用户1");
-                connect(Utils.USER_1);
-                break;
-            case R.id.btn_user2:
-                setText("当前用户2");
-                connect(Utils.USER_2);
-                break;
             case R.id.btn_leave:
                 leaveRoom();
                 break;
@@ -184,6 +166,7 @@ public class Meeting1V1MainActivity extends BaseActivity {
         }
     }
 
+    //todo 安卓资源管理文档：https://docs.rongcloud.cn/v4/views/rtc/meeting/guide/resource/android.html
     private void publishDefaultAVStream(RCRTCRoom rcrtcRoom) {
         rcrtcRoom.getLocalUser().publishDefaultStreams(new IRCRTCResultCallback() {
             @Override
@@ -198,6 +181,7 @@ public class Meeting1V1MainActivity extends BaseActivity {
         });
     }
 
+    //todo 安卓资源管理文档：https://docs.rongcloud.cn/v4/views/rtc/meeting/guide/resource/android.html
     private void subscribeStreams(RCRTCRoom rcrtcRoom) {
         RCRTCRemoteUser remoteUser = rcrtcRoom.getRemoteUser("003");
         rcrtcRoom.getLocalUser().subscribeStreams(remoteUser.getStreams(), new IRCRTCResultCallback() {
@@ -268,7 +252,12 @@ public class Meeting1V1MainActivity extends BaseActivity {
 
         @Override
         public void onRemoteUserUnpublishResource(RCRTCRemoteUser rcrtcRemoteUser, List<RCRTCInputStream> list) {
-            remoteUser.removeAllViews();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    remoteUser.removeAllViews();
+                }
+            });
         }
 
         /**
@@ -278,12 +267,7 @@ public class Meeting1V1MainActivity extends BaseActivity {
          */
         @Override
         public void onUserJoined(final RCRTCRemoteUser rcrtcRemoteUser) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(Meeting1V1MainActivity.this, "用户：" + rcrtcRemoteUser.getUserId() + " 加入房间", Toast.LENGTH_SHORT).show();
-                }
-            });
+            showToast("用户：" + rcrtcRemoteUser.getUserId() + " 加入房间");
         }
 
         /**

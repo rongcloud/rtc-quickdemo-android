@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">callLib</string>
+    <string name="accept">接听</string>
+    <string name="hang_up">挂断</string>
+    <string name="call">呼叫</string>
+</resources>
