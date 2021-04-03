@@ -1,7 +1,6 @@
 package cn.rongcloud.quickdemo_live.tools;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,6 +8,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import androidx.annotation.Nullable;
 import cn.rongcloud.quickdemo_live.R;
 import cn.rongcloud.rtc.api.stream.RCRTCVideoView;
 import java.util.LinkedHashMap;

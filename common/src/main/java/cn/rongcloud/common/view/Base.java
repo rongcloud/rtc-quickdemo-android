@@ -4,13 +4,13 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import cn.rongcloud.common.R;
 import cn.rongcloud.common.tools.LoadDialog;
 import java.util.ArrayList;
@@ -137,6 +137,13 @@ public class Base extends Activity {
                 notClickableArray[i].setClickable(true);
                 notClickableArray[i].setBackgroundResource(R.drawable.shape_corner_button_blue_invalid);
             }
+        }
+    }
+
+    protected void setButtonClickable(Button[] buttonArray,boolean clickable) {
+        for (int i = 0; i < buttonArray.length; i++) {
+            buttonArray[i].setClickable(clickable);
+            buttonArray[i].setBackgroundResource(clickable? R.drawable.shape_corner_button_blue:R.drawable.shape_corner_button_blue_invalid);
         }
     }
 }

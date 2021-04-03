@@ -36,18 +36,6 @@
       android:layout_height="wrap_content">
 
       <TextView
-        android:layout_width="wrap_content"
-        android:textSize="13sp"
-        android:layout_marginLeft="15dp"
-        android:textColor="@color/gray"
-        android:ellipsize="end"
-        android:lines="1"
-        android:text="LiveUrl ："
-        android:layout_marginTop="2dp"
-        android:layout_marginBottom="2dp"
-        android:layout_height="wrap_content"/>
-
-      <TextView
         android:id="@+id/tv_liveUrl"
         android:layout_width="wrap_content"
         android:textSize="13sp"
@@ -225,18 +213,6 @@
         android:text="自适应布局"
         android:layout_height="wrap_content"/>
 
-      <Button
-        android:id="@+id/btn_sendMessage"
-        android:onClick="onClick"
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:textColor="@color/white"
-        android:layout_marginTop="3dp"
-        android:layout_marginBottom="3dp"
-        android:layout_marginRight="5dp"
-        android:background="@drawable/shape_corner_button_blue"
-        android:text="发送直播地址"
-        android:layout_height="wrap_content"/>
 
     </LinearLayout>
 

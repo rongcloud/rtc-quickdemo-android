@@ -4,4 +4,5 @@ include ':quickdemo-calllib'
 include ':quickdemo-meeting-1v1'
 include ':quickdemo-pk'
 include ':common'
+include ':IMLib', ':RtcLib'
 rootProject.name = "rtc-quickdemo-android"

@@ -1,10 +1,10 @@
 package cn.rongcloud.quickdemo_callkit;
 
-import android.support.multidex.MultiDexApplication;
+import androidx.multidex.MultiDexApplication;
 import cn.rongcloud.common.tools.Utils;
 import io.rong.imkit.RongIM;
 
-public class CallKitApp extends MultiDexApplication{
+public class CallKitApp extends MultiDexApplication {
 
     @Override
     public void onCreate() {

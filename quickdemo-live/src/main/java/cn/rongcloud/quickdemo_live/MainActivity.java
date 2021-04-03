@@ -20,6 +20,8 @@ import cn.rongcloud.rtc.api.RCRTCEngine;
 import cn.rongcloud.rtc.api.RCRTCMixConfig;
 import cn.rongcloud.rtc.api.RCRTCRemoteUser;
 import cn.rongcloud.rtc.api.RCRTCRoom;
+import cn.rongcloud.rtc.api.RCRTCRoomConfig;
+import cn.rongcloud.rtc.api.RCRTCRoomConfig.Builder;
 import cn.rongcloud.rtc.api.callback.IRCRTCResultCallback;
 import cn.rongcloud.rtc.api.callback.IRCRTCResultDataCallback;
 import cn.rongcloud.rtc.api.callback.IRCRTCRoomEventsListener;
@@ -31,12 +33,14 @@ import cn.rongcloud.rtc.api.stream.RCRTCVideoInputStream;
 import cn.rongcloud.rtc.api.stream.RCRTCVideoStreamConfig;
 import cn.rongcloud.rtc.api.stream.RCRTCVideoView;
 import cn.rongcloud.rtc.base.RCRTCAVStreamType;
+import cn.rongcloud.rtc.base.RCRTCLiveRole;
 import cn.rongcloud.rtc.base.RCRTCMediaType;
 import cn.rongcloud.rtc.base.RCRTCRoomType;
 import cn.rongcloud.rtc.base.RCRTCStream;
 import cn.rongcloud.rtc.base.RCRTCSubscribeState;
 import cn.rongcloud.rtc.base.RTCErrorCode;
 import cn.rongcloud.rtc.center.stream.RCVideoInputStreamImpl;
+import cn.rongcloud.rtc.utils.RCConsts;
 import io.rong.imlib.IRongCallback.ISendMessageCallback;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.RongIMClient.DatabaseOpenStatus;
@@ -53,20 +57,25 @@ public class MainActivity extends Base {
 
     private static final String TAG = "LiveMainActivity";
     private RCRTCRoom mRTCRoom;
-    private Button btn_a,btn_b,btn_c,btn_d,btn_joinRoom,btn_subscribeLiveStream, btn_viewerJoin,btn_camera,btn_mic,btn_layout,btn_sendMessage;
-    private TextView tv_title,tv_liveUrl;
+    private Button btn_a,btn_b,btn_c,btn_d,btn_joinRoom,btn_subscribeLiveStream, btn_viewerJoin,btn_camera,btn_mic,btn_layout;
+    private TextView tv_title;
     private LinearLayout linear_host;
     private VideoViewManager mVideoViewManager;
     private RoleType mRoleType = RoleType.UNKNOWN;
     private RCRTCLiveInfo mLiveInfo;
+    private boolean executing = false;  //是否执行任务中
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
+        initRTCSDK();
+    }
+
+    private void initRTCSDK() {
         //TODO RCRTCConfig.Builder 请参考API文档：https://www.rongcloud.cn/docs/api/android/rtclib_v4/cn/rongcloud/rtc/api/RCRTCConfig.Builder.html
-        RCRTCConfig config = cn.rongcloud.rtc.api.RCRTCConfig.Builder.create()
+        RCRTCConfig config = RCRTCConfig.Builder.create()
             .enableHardwareDecoder(true)    //是否硬解码
             .enableHardwareEncoder(true)    //是否硬编码
             .build();
@@ -85,14 +94,12 @@ public class MainActivity extends Base {
         mVideoViewManager = new VideoViewManager(MainActivity.this.getApplicationContext());
         LinearLayout.LayoutParams layoutParams2 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         linear_host.addView(mVideoViewManager,layoutParams2);
-        tv_liveUrl = findViewById(R.id.tv_liveUrl);
         btn_subscribeLiveStream = findViewById(R.id.btn_subscribeLiveStream);
         btn_viewerJoin = findViewById(R.id.btn_viewerJoin);
         btn_camera = findViewById(R.id.btn_camera);
         btn_mic = findViewById(R.id.btn_mic);
         btn_layout = findViewById(R.id.btn_layout);
-        btn_sendMessage = findViewById(R.id.btn_sendMessage);
-        setButtonClickable(null,new Button[]{btn_joinRoom,btn_subscribeLiveStream, btn_viewerJoin,btn_camera,btn_mic,btn_layout,btn_sendMessage});
+        setButtonClickable(new Button[]{btn_joinRoom,btn_subscribeLiveStream, btn_viewerJoin,btn_camera,btn_mic,btn_layout},false);
     }
 
     public void onClick(View view){
@@ -131,32 +138,58 @@ public class MainActivity extends Base {
                 }
                 break;
             case R.id.btn_joinRoom://开始直播
+                if (executing) {
+                    showToast("您点击的太快了，请稍后再试");
+                    return;
+                }
+                executing = true;
+                mRoleType = RoleType.ANCHOR;
                 String text = btn_joinRoom.getText().toString();
                 tv_title.setText(Constants.HOST_PAGE_TITLE);
                 if(TextUtils.equals(text,Constants.JOIN)){
                     joinRoom();
                 }else{
-                    leaveRoom();
+                    leaveRoom(false);
+                    setButtonClickable(new Button[]{btn_subscribeLiveStream,btn_joinRoom},true);
+                }
+                break;
+            case R.id.btn_subscribeLiveStream://观众观看直播
+                if (executing) {
+                    showToast("您点击的太快了，请稍后再试");
+                    return;
+                }
+                executing = true;
+                mRoleType = RoleType.VIEWER;
+                tv_title.setText(Constants.VIEWER_PAGE_TITLE);
+                if(TextUtils.equals(str,Constants.SUB)){
+                    joinRoom();
+                }else if(TextUtils.equals(str,Constants.UN_SUB)){
+                    leaveRoom(false);
+                    setButtonClickable(new Button[]{btn_viewerJoin},false);
+                }
+                break;
+            case R.id.btn_viewerJoin://观众上麦
+                if (executing) {
+                    showToast("您点击的太快了，请稍后再试");
+                    return;
+                }
+                executing = true;
+                if(TextUtils.equals(str,Constants.VIEWER_JOIN)){
+                    mRoleType = RoleType.ANCHOR;
+                    if (mRTCRoom != null)
+                        leaveRoom(true);
+                    else
+                        joinRoom(true);
+                }else{
+                    ((Button)view).setText(Constants.VIEWER_JOIN);
+                    mRoleType = RoleType.UNKNOWN;
+                    leaveRoom(false);
+                    setButtonClickable(new Button[]{btn_subscribeLiveStream,btn_joinRoom},true);
+                    setButtonClickable(new Button[]{btn_viewerJoin},false);
                 }
                 break;
             case R.id.btn_layout://合流布局设置
                 setMixLayout(str);
-                break;
-            case R.id.btn_subscribeLiveStream://观看直播
-                tv_title.setText(Constants.VIEWER_PAGE_TITLE);
-                String liveUrl = tv_liveUrl.getText().toString();
-                if(TextUtils.isEmpty(liveUrl)){
-                    showToast("观看的直播地址为空，请先通过主播获取直播地址！");
-                    return;
-                }
-                if(TextUtils.equals(str,Constants.SUB)){
-                    subscribeLiveStream(liveUrl);
-                }else if(TextUtils.equals(str,Constants.UN_SUB)){
-                    unsubscribeLiveStream(liveUrl);
-                }
-                break;
-            case R.id.btn_sendMessage:
-                sendLiveUrlMessage();
                 break;
             case R.id.btn_camera:
                 if(TextUtils.equals(str,Constants.CAMERA_STATUS_CLOSE)){
@@ -176,14 +209,7 @@ public class MainActivity extends Base {
                     ((Button)view).setText(Constants.MIC_STATUS_CLOSE);
                 }
                 break;
-            case R.id.btn_viewerJoin:
-                if(TextUtils.equals(str,Constants.VIEWER_JOIN)){
-                    viewerJoin();//观众上麦
-                }else{
-                    ((Button)view).setText(Constants.VIEWER_JOIN);
-                    leaveRoom();//观众下麦
-                }
-                break;
+
             default:
                 break;
         }
@@ -234,7 +260,13 @@ public class MainActivity extends Base {
         mLiveInfo.setMixConfig(config, new IRCRTCResultCallback() {
             @Override
             public void onSuccess() {
-                btn_layout.setText(finalText);
+                postUIThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (btn_layout != null)
+                            btn_layout.setText(finalText);
+                    }
+                });
             }
 
             @Override
@@ -245,50 +277,62 @@ public class MainActivity extends Base {
     }
 
     /**
-     * todo 主播加入房间 或 观众上麦
-     * 请参考开发者文档：https://docs.rongcloud.cn/v4/views/rtc/livevideo/guide/joinManage/join/android.html#audienceJoin
+     * 加入房间
+     * 默认不是切换角色
      */
     private void joinRoom(){
+        joinRoom(false);
+    }
+
+    /**
+     * todo 主播加入房间 或 观众上麦
+     * 请参考开发者文档：https://docs.rongcloud.cn/v4/views/rtc/livevideo/guide/joinManage/join/android.html#audienceJoin
+     * @param switchRole 是否切换角色操作
+     */
+    private void joinRoom(boolean switchRole){
         showLoading();
-        RCRTCVideoStreamConfig videoConfigBuilder = RCRTCVideoStreamConfig.Builder.create()
-            .setVideoResolution(Constants.resolution)    //设置分辨率
-            .setVideoFps(Constants.fps)  //设置帧率
-            .setMinRate(Constants.mixRate)    //设置最小码率，480P下推荐200
-            .setMaxRate(Constants.maxRate)     //设置最大码率，480P下推荐900
+        //由于观众是不能发布资源的，所以不需要设置音视频配置的，只有主播才需要配置
+        if (mRoleType == RoleType.ANCHOR) {
+            RCRTCVideoStreamConfig videoConfigBuilder = RCRTCVideoStreamConfig.Builder.create().setVideoResolution(Constants.resolution)    //设置分辨率
+                .setVideoFps(Constants.fps)  //设置帧率
+                .setMinRate(Constants.mixRate)    //设置最小码率，480P下推荐200
+                .setMaxRate(Constants.maxRate)     //设置最大码率，480P下推荐900
+                .build();
+            RCRTCEngine.getInstance().getDefaultVideoStream().setVideoConfig(videoConfigBuilder);
+            // 创建本地视频显示视图
+            RCRTCVideoView rongRTCVideoView = new RCRTCVideoView(getApplicationContext());
+            RCRTCEngine.getInstance().getDefaultVideoStream().setVideoView(rongRTCVideoView);
+            mVideoViewManager.addRTCVideoView(RongIMClient.getInstance().getCurrentUserId(), rongRTCVideoView);
+            //开启摄像头采集视频数据
+            RCRTCEngine.getInstance().getDefaultVideoStream().startCamera(null);
+        }
+
+        //设置房间配置：包括房间类型以及角色信息
+        RCRTCRoomConfig roomConfig = Builder.create()
+            //RTCLib 房间角色分为主播(RCRTCRole.ANCHOR) 和 观众两种角色(RCRTCRole.AUDIENCE)
+            .setLiveRole(mRoleType == RoleType.VIEWER ? RCRTCLiveRole.AUDIENCE : RCRTCLiveRole.BROADCASTER)
+            //根据实际场景，选择音视频直播：LIVE_AUDIO_VIDEO 或音频直播：LIVE_AUDIO
+            .setRoomType(RCRTCRoomType.LIVE_AUDIO_VIDEO)
             .build();
-        RCRTCEngine.getInstance().getDefaultVideoStream().setVideoConfig(videoConfigBuilder);
-        // 创建本地视频显示视图
-        RCRTCVideoView rongRTCVideoView = new RCRTCVideoView(getApplicationContext());
-        RCRTCEngine.getInstance().getDefaultVideoStream().setVideoView(rongRTCVideoView);
-        mVideoViewManager.addRTCVideoView(RongIMClient.getInstance().getCurrentUserId(), rongRTCVideoView);
-        //开启摄像头采集视频数据
-        RCRTCEngine.getInstance().getDefaultVideoStream().startCamera(null);
-        //根据实际场景，选择音视频直播：LIVE_AUDIO_VIDEO 或音频直播：LIVE_AUDIO
-        RCRTCRoomType rtcRoomType = RCRTCRoomType.LIVE_AUDIO_VIDEO;
+
         //mRoomId：最大长度 64 个字符，可包含：`A-Z`、`a-z`、`0-9`、`+`、`=`、`-`、`_`
-        RCRTCEngine.getInstance().joinRoom(Constants.ROOM_ID, rtcRoomType, new IRCRTCResultDataCallback<RCRTCRoom>() {
+        RCRTCEngine.getInstance().joinRoom(Constants.ROOM_ID, roomConfig, new IRCRTCResultDataCallback<RCRTCRoom>() {
             @Override
             public void onSuccess(RCRTCRoom rcrtcRoom) {
                 postUIThread(new Runnable() {
                     @Override
                     public void run() {
+                        executing = false;
                         closeLoading();
-                        showToast("加入RTC房间成功");
-                        setButtonClickable(new Button[]{btn_camera,btn_mic,btn_layout},new Button[]{btn_subscribeLiveStream});
-                        if(mRoleType == RoleType.UNKNOWN){//第一次加入房间，身份更新至ANCHOR
-                            btn_joinRoom.setText(Constants.LEAVE);
-                            mRoleType = RoleType.ANCHOR;
-                        }else if(mRoleType == RoleType.VIEWER){//观众上麦逻辑
-                            btn_viewerJoin.setText(Constants.VIEWER_LEAVE);
-                        }
+                        showToast("加入房间成功");
                         mRTCRoom = rcrtcRoom;
                         mRTCRoom.registerRoomListener(roomEventsListener);//注册房间事件回调
-                        //加入房间成功后，发布默认音视频流。该方法实现请查看开发者文档 ： https://docs.rongcloud.cn/v4/views/rtc/livevideo/guide/quick/anchor/android.html#publish
-                        publishDefaultLiveStreams();
-                        //加入房间成功后，如果房间中已存在用户且发布了音、视频流，就订阅远端用户发布的音视频流。该方法实现请查看开发者文档 ： https://docs.rongcloud.cn/v4/views/rtc/livevideo/guide/quick/anchor/android.html#Subscribe
-                        for (RCRTCRemoteUser remoteUser : rcrtcRoom.getRemoteUsers()) {
-                            subscribeAVStream(remoteUser.getUserId(),remoteUser.getStreams());
-                        }
+                        if (mRoleType == RoleType.ANCHOR)
+                            onAnchorJoinSuccess(switchRole);
+                        else
+                            onAudienceJoinSuccess();
+
+
                     }
                 });
             }
@@ -299,6 +343,7 @@ public class MainActivity extends Base {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        executing = false;
                         mVideoViewManager.release();
                         RCRTCEngine.getInstance().getDefaultVideoStream().stopCamera();
                         closeLoading();
@@ -309,36 +354,94 @@ public class MainActivity extends Base {
     }
 
     /**
+     * 观众加房间成功
+     */
+    private void onAudienceJoinSuccess() {
+        //1. 订阅直播合流
+        List<RCRTCInputStream> liveStreams = mRTCRoom.getLiveStreams();
+        //这个需注意: 如果主播还未进RTC房间或进房间后未发布任何资源，则 getLiveStreams() 会返回null，
+        // 如果房间内主播再观众加入之后发布了资源，可以通过注册房间回调事件通过 IRCRTCRoomEventsListener#onLiveStreamsPublish 回调方法来监听
+        if (liveStreams != null && !liveStreams.isEmpty()){
+            //由于直播流是所有主播合并后的流所有不能归属任何一个主播下，所以UserI可以根据实际情况自己定义
+            //暂用 roomId 来表示
+            subscribeAVStream(RCConsts.ROOMID,liveStreams);
+        }
+
+        //2. 除了可以订阅直播合流，还可以单独订阅某个主播的音视频流
+        // 这里为了便于演示，默认订阅了所有主播的音视频流
+        for (RCRTCRemoteUser remoteUser : mRTCRoom.getRemoteUsers()) {
+            subscribeAVStream(remoteUser.getUserId(),remoteUser.getStreams());
+        }
+        //3. update ui
+        setButtonClickable(new Button[]{btn_joinRoom,btn_camera,btn_mic,btn_layout},false);
+        setButtonClickable(new Button[]{btn_viewerJoin},true);
+        btn_subscribeLiveStream.setText(Constants.UN_SUB);
+    }
+
+    /**
+     * 主播加入房间成功
+     * @param switchRole 是否切换角色操作
+     */
+    private void onAnchorJoinSuccess(boolean switchRole) {
+        setButtonClickable(new Button[]{btn_subscribeLiveStream},false);
+        setButtonClickable(new Button[]{btn_camera,btn_mic,btn_layout},true);
+
+        if(switchRole){//观众上麦逻辑
+            btn_viewerJoin.setText(Constants.VIEWER_LEAVE);
+        }else {
+            btn_joinRoom.setText(Constants.LEAVE);
+        }
+        //加入房间成功后，发布默认音视频流。该方法实现请查看开发者文档 ： https://docs.rongcloud.cn/v4/views/rtc/livevideo/guide/quick/anchor/android.html#publish
+        publishDefaultLiveStreams();
+        //加入房间成功后，如果房间中已存在用户且发布了音、视频流，就订阅远端用户发布的音视频流。该方法实现请查看开发者文档 ： https://docs.rongcloud.cn/v4/views/rtc/livevideo/guide/quick/anchor/android.html#Subscribe
+        for (RCRTCRemoteUser remoteUser : mRTCRoom.getRemoteUsers()) {
+            subscribeAVStream(remoteUser.getUserId(),remoteUser.getStreams());
+        }
+    }
+
+    /**
      * 离开音视频房间
      * SDK 内部会自动取消发布本端资源和取消订阅远端用户资源，必须在成功或失败回调完成之后再开始新的音视频通话逻辑。
+     * @param switchRole 是否切换角色操作，true: 切换角色重新调用jonroom方法
      */
-    private void leaveRoom(){
+    private void leaveRoom(boolean switchRole){
+        resetView();
+        setButtonClickable(new Button[]{btn_camera,btn_mic,btn_layout},false);
+        mVideoViewManager.release();
+        mLiveInfo = null;
+        mRTCRoom = null;
+        if (!switchRole){
+            btn_joinRoom.setText(Constants.JOIN);
+        }
         RCRTCEngine.getInstance().leaveRoom(new IRCRTCResultCallback() {
             @Override
             public void onSuccess() {
+                postUIThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //如果是切换角色，则需要再次重新加房间
+                        if (switchRole){
+                            joinRoom(true);
+                        }else {
+                            executing = false;
+                        }
+                    }
+                });
             }
 
             @Override
             public void onFailed(RTCErrorCode rtcErrorCode) {
-                showToast("结束直播失败 : "+rtcErrorCode.getReason());
-            }
-        });
-        postUIThread(new Runnable() {
-            @Override
-            public void run() {
-                if(mRoleType == RoleType.VIEWER){//观众下麦逻辑
-                    mRoleType = RoleType.VIEWER;
-                    setButtonClickable(new Button[]{btn_subscribeLiveStream},new Button[]{btn_camera,btn_mic,btn_layout,btn_sendMessage});
-                    btn_camera.setText(Constants.CAMERA_STATUS_CLOSE);
-                    btn_mic.setText(Constants.MIC_STATUS_CLOSE);
-                    btn_layout.setText(Constants.ADAPTIVE);
-                }else{
-                    mRoleType = RoleType.UNKNOWN;
+                if (switchRole){
+                    showToast("上麦失败: "+rtcErrorCode.getReason());
+                }else {
+                    showToast("结束直播失败 : " + rtcErrorCode.getReason());
                 }
-                btn_joinRoom.setText(Constants.JOIN);
-                if (mVideoViewManager != null) {
-                    mVideoViewManager.release();
-                }
+                postUIThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        executing = false;
+                    }
+                });
             }
         });
     }
@@ -400,113 +503,13 @@ public class MainActivity extends Base {
             public void onSuccess(RCRTCLiveInfo liveInfo) {
                 showToast("发布资源成功");
                 mLiveInfo = liveInfo;
-                //TODO 上传liveUrl到客户自己的APP server，提供给观众端用来订阅
-                String liveUrl = mLiveInfo.getLiveUrl();
-                setLiveUrl(liveUrl);
-                postUIThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        setButtonClickable(new Button[]{btn_sendMessage},null);
-                    }
-                });
             }
 
             @Override
             public void onFailed(final RTCErrorCode errorCode) {
                 showToast("发布资源失败 ：" + errorCode.getReason());
-                setLiveUrl("");
             }
         });
-    }
-
-    //todo 观众观看直播，请参考开发者文档：https://docs.rongcloud.cn/v4/views/rtc/livevideo/guide/audienceManage/android.html
-    private void subscribeLiveStream(String liveUrl){
-        showLoading();
-        /**
-         * 仅直播模式下观众可用。 作为观众，直接观看主播的直播，无需加入房间，通过传入主播的 url 进行订阅。
-         *
-         * @param liveUrl   直播URL
-         * @param avStreamType  直播类型
-         * @param callBack  加入直播房间结果回调
-         */
-        RCRTCEngine.getInstance().subscribeLiveStream(liveUrl, RCRTCAVStreamType.AUDIO_VIDEO, new RCRTCLiveCallback() {
-            @Override
-            public void onSuccess() {
-                //订阅成功，后续会根据订阅的类型，触发 onAudioStreamReceived 和 onVideoStreamReceived方法
-                postUIThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        closeLoading();
-                        mRoleType = RoleType.VIEWER;
-                        setButtonClickable(new Button[]{btn_viewerJoin},new Button[]{btn_joinRoom,btn_camera,btn_mic,btn_layout, btn_sendMessage});
-                    }
-                });
-            }
-
-            @Override
-            public void onVideoStreamReceived(final RCRTCVideoInputStream stream) {
-                //收到视频流。操作UI需要转到 UI 线程
-                postUIThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        btn_subscribeLiveStream.setText(Constants.UN_SUB);
-                        //创建 RCRTCVideoView
-                        RCRTCVideoView videoView = new RCRTCVideoView(getApplicationContext());
-                        //给input stream设置用于显示视频的视图
-                        stream.setVideoView(videoView);
-                        if (mVideoViewManager != null) {
-                            mVideoViewManager.addRTCVideoView(((RCVideoInputStreamImpl)stream).getUserId(),videoView);
-                        }
-                    }
-                });
-            }
-
-            @Override
-            public void onAudioStreamReceived(RCRTCAudioInputStream stream) {
-                //收到音频流
-            }
-
-            @Override
-            public void onFailed(RTCErrorCode errorCode) {
-                showToast("观看直播失败："+errorCode.getReason());
-                postUIThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        closeLoading();
-                    }
-                });
-            }
-        });
-    }
-
-    //todo 取消观看直播：请参考开发者文档：https://docs.rongcloud.cn/v4/views/rtc/livevideo/guide/audienceManage/android.html#unsubscribe
-    private void unsubscribeLiveStream(String liveUrl){
-        showLoading();
-        RCRTCEngine.getInstance().unsubscribeLiveStream(liveUrl, new IRCRTCResultCallback() {
-            @Override
-            public void onSuccess() {
-                showToast("取消观看直播成功");
-                postUIThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        closeLoading();
-                    }
-                });
-            }
-
-            @Override
-            public void onFailed(RTCErrorCode errorCode) {
-                showToast("取消观看直播失败 ： "+errorCode);
-                postUIThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        closeLoading();
-                    }
-                });
-            }
-        });
-        btn_subscribeLiveStream.setText(Constants.SUB);
-        mVideoViewManager.release();
     }
 
     private void connectIM(String token,Button btn,Button buttonArray[]) {
@@ -527,31 +530,12 @@ public class MainActivity extends Base {
                 postUIThread(new Runnable() {
                     @Override
                     public void run() {
-                        //设置IM消息监听，具体说明请参考开发者文档：https://docs.rongcloud.cn/v4/views/im/noui/guide/chatroom/setting/listener/android.html#messagelistener
-                        ChatRoomKit.setReceiveMessageListener(new OnReceiveMessageWrapperListener() {
-                            @Override
-                            public boolean onReceived(Message message, int i, boolean b, boolean b1) {
-                                MessageContent msgContent = message.getContent();
-                                if(msgContent instanceof TextMessage)
-                                    setLiveUrl(((TextMessage) msgContent).getContent());
-                                return false;
-                            }
-                        });
-                        ChatRoomKit.joinChatRoom(Constants.ROOM_ID, -1, new OperationCallback() {
-                            @Override
-                            public void onSuccess() {
-                                showToast("加入聊天室成功");
-                            }
-
-                            @Override
-                            public void onError(ErrorCode errorCode) {
-                                showToast("加入聊天室失败 ："+errorCode.getValue());
-                            }
-                        });
+                        initRTCSDK();
                         closeLoading();
                         btn.setText(Constants.LOGOUT);
                         showToast("用户 "+s +"登录成功!");
-                        setButtonClickable(new Button[]{btn_joinRoom,btn_subscribeLiveStream},buttonArray);
+                        setButtonClickable(buttonArray,false);
+                        setButtonClickable(new Button[]{btn_joinRoom,btn_subscribeLiveStream},true);
                     }
                 });
             }
@@ -621,16 +605,25 @@ public class MainActivity extends Base {
         public void onLeaveRoom(int i) {
 
         }
-    };
 
-    private void setLiveUrl(String liveUrl){
-        postUIThread(new Runnable() {
-            @Override
-            public void run() {
-                tv_liveUrl.setText(liveUrl);
-            }
-        });
-    }
+        @Override
+        public void onPublishLiveStreams(final List<RCRTCInputStream> streams) {
+            Log.e(TAG,"onPublishLiveStreams");
+            postUIThread(new Runnable() {
+                @Override
+                public void run() {
+                    //由于直播流是所有主播合并后的流所有不能归属任何一个主播下，所以UserI可以根据实际情况自己定义
+                    //暂用 roomId 来表示
+                    subscribeAVStream(RCConsts.ROOMID,streams);
+                }
+            });
+        }
+
+        @Override
+        public void onUnpublishLiveStreams(List<RCRTCInputStream> list) {
+
+        }
+    };
 
     /**
      * im 登出
@@ -638,85 +631,18 @@ public class MainActivity extends Base {
     private void logout(){
         showLoading();
         ChatRoomKit.quitChatRoom(Constants.ROOM_ID,null);
-        setButtonClickable(new Button[]{btn_a,btn_b,btn_c,btn_d},new Button[]{btn_joinRoom,btn_subscribeLiveStream, btn_viewerJoin,btn_camera,btn_mic,btn_layout,btn_sendMessage});
+        setButtonClickable(new Button[]{btn_a,btn_b,btn_c,btn_d},true);
+        setButtonClickable(new Button[]{btn_joinRoom,btn_subscribeLiveStream, btn_viewerJoin,btn_camera,btn_mic,btn_layout},false);
         ChatRoomKit.setReceiveMessageListener(null);
-        //
-        if(mRoleType == RoleType.ANCHOR){
-            leaveRoom();
-        }else if(mRoleType == RoleType.VIEWER){
-            unsubscribeLiveStream(tv_liveUrl.getText().toString());
-        }
+        leaveRoom(false);
         //断开与融云服务器的连接，但仍然接收远程推送。<strong>注意：</strong>因为 SDK 在前后台切换或者网络出现异常都会自动重连，保证连接可靠性。所以除非您的 App 逻辑需要登出，否则一般不需要调用此方法进行手动断开。<br>
         RongIMClient.getInstance().disconnect();
         //断开与融云服务器的连接，并且不再接收远程推送消息。若想断开连接后仍然接受远程推送消息，可以调用 {@link #disconnect()}
         RongIMClient.getInstance().logout();
         resetView();
-        setLiveUrl("");
         mLiveInfo = null;
         mRoleType = RoleType.UNKNOWN;
         closeLoading();
-    }
-
-    //观众上麦方法
-    private void viewerJoin() {
-        String liveUrl = tv_liveUrl.getText().toString();
-        if(mVideoViewManager!=null){
-            mVideoViewManager.clear();
-        }
-        if(!TextUtils.isEmpty(liveUrl)){
-            btn_subscribeLiveStream.setText(Constants.SUB);
-            RCRTCEngine.getInstance().unsubscribeLiveStream(liveUrl, new IRCRTCResultCallback() {
-                @Override
-                public void onSuccess() {
-                    postUIThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            joinRoom();
-                        }
-                    });
-                }
-
-                @Override
-                public void onFailed(RTCErrorCode rtcErrorCode) {
-                    postUIThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            joinRoom();
-                        }
-                    });
-                }
-            });
-        }else{
-            joinRoom();
-        }
-    }
-
-    private void sendLiveUrlMessage() {
-        String liveUrl;
-        liveUrl = tv_liveUrl.getText().toString();
-        if(TextUtils.isEmpty(liveUrl)){
-            showToast("观看的直播地址为空，请先通过主播获取直播地址！");
-            return;
-        }
-        showLoading();
-        TextMessage messageContent = TextMessage.obtain(liveUrl);
-        ChatRoomKit.sendMessage(Constants.ROOM_ID, messageContent, new ISendMessageCallback() {
-            @Override
-            public void onAttached(Message message) {
-            }
-
-            @Override
-            public void onSuccess(Message message) {
-                showToast("消息发送成功");
-                closeLoading();
-            }
-
-            @Override
-            public void onError(Message message, ErrorCode errorCode) {
-                showToast("消息发送失败 ： "+errorCode.getValue());
-                closeLoading();
-            }
-        });
     }
 
     private void removeRTCVideoView(String userId){

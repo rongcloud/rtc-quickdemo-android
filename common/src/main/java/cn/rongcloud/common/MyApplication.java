@@ -1,6 +1,6 @@
 package cn.rongcloud.common;
 
-import android.support.multidex.MultiDexApplication;
+import androidx.multidex.MultiDexApplication;
 import cn.rongcloud.common.tools.Utils;
 import io.rong.imlib.RongIMClient;
 

@@ -66,7 +66,7 @@ public class Meeting1V1MainActivity extends BaseActivity {
     private void joinRoom() {
         Builder configBuilder = Builder.create();
         //是否硬解码
-        configBuilder.enableHardwareDecoder(true);
+        configBuilder.enableHardwareDecoder(false);
         //是否硬编码
         configBuilder.enableHardwareEncoder(true);
         RCRTCEngine.getInstance().init(getApplicationContext(), configBuilder.build());
@@ -287,6 +287,16 @@ public class Meeting1V1MainActivity extends BaseActivity {
 
         @Override
         public void onUserOffline(RCRTCRemoteUser rcrtcRemoteUser) {
+
+        }
+
+        @Override
+        public void onPublishLiveStreams(List<RCRTCInputStream> list) {
+
+        }
+
+        @Override
+        public void onUnpublishLiveStreams(List<RCRTCInputStream> list) {
 
         }
 

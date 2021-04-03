@@ -484,6 +484,16 @@ public class PKMainActivity extends BaseActivity {
         }
 
         @Override
+        public void onPublishLiveStreams(List<RCRTCInputStream> list) {
+
+        }
+
+        @Override
+        public void onUnpublishLiveStreams(List<RCRTCInputStream> list) {
+
+        }
+
+        @Override
         public void onLeaveRoom(int i) {
 
         }

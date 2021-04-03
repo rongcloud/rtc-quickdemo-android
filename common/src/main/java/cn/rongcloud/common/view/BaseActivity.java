@@ -2,7 +2,6 @@ package cn.rongcloud.common.view;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,9 +9,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import androidx.annotation.Nullable;
 import cn.rongcloud.common.R;
 import cn.rongcloud.common.tools.Utils;
 import io.rong.imlib.RongIMClient;
+import io.rong.imlib.RongIMClient.ConnectionErrorCode;
+import io.rong.imlib.RongIMClient.ConnectionStatusListener.ConnectionStatus;
 import io.rong.imlib.RongIMClient.DatabaseOpenStatus;
 
 /**
@@ -35,6 +37,10 @@ public abstract class BaseActivity extends Base {
     }
 
     private void connectIM(String token) {
+        if (RongIMClient.getInstance().getCurrentConnectionStatus() == ConnectionStatus.CONNECTED) {
+            showToast("IM已经连接成功，无需再次连接");
+            return;
+        }
         localUserId="";
         /**
          * 连接融云服务器，在整个应用程序全局，只需要调用一次，需在 {@link #init(Context, String)} 之后调用。
@@ -62,6 +68,10 @@ public abstract class BaseActivity extends Base {
 
             @Override
             public void onError(RongIMClient.ConnectionErrorCode errorCode) {
+                if(ConnectionErrorCode.RC_CONNECTION_EXIST == errorCode){
+                    //TODO IM连接已经存在，无需重复连接。可以直接加入RTC房间
+                    return;
+                }
                 showToast("IM 连接失败 ："+errorCode);
                 localUserId="";
                 Log.d(TAG,"RongIMClient.connect.onError :"+errorCode.getValue());

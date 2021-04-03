@@ -27,7 +27,7 @@ android {
 
 dependencies {
     //common 模块中已经引入了im_lib
-    implementation project(':common')\
+    implementation project(':common')
     //rtc-quickdemo-android\config.gradle
     api  rootProject.ext.dependencies.rtc_lib
 }
