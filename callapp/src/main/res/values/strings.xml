@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">RCRTCQuickDemo</string>
+    <string name="login_text_user_id">用户名</string>
+    <string name="login_hint_user_id">请输入</string>
+    <string name="meeting">1v1会议</string>
+    <string name="meeting_1v1">Meeting 1v1</string>
+    <string name="logout">注销</string>
+</resources>

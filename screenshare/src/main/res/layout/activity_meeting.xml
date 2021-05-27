@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FF232323"
+    tools:context=".ui.activity.MeetingActivity"
+    android:keepScreenOn="true">
+
+    <include layout="@layout/layout_meeting_videos" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_mute"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/iv_hangup"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/ic_mute_selector" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_hangup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/iv_ear_monitoring"
+        app:layout_constraintStart_toEndOf="@+id/iv_mute"
+        app:srcCompat="@drawable/ic_hangup_selector" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_ear_monitoring"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/iv_hangup"
+        app:srcCompat="@drawable/ic_ear_monitoring" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

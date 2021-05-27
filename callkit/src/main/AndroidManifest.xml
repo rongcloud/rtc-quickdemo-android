@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="cn.rongcloud.callkit">
+
+    <!-- 音视频需要网络权限 和 监听网络状态权限 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <!-- 摄像头采集需要 -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- 音频采集需要 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
+    <application>
+        <activity
+            android:theme="@style/Theme.Rtcquickdemoandroid"
+            android:name="cn.rongcloud.callkit.activity.CallKitActivity"
+            android:screenOrientation="portrait" />
+    </application>
+
+</manifest>

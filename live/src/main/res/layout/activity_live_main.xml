@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:id="@+id/surfcecontainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/ll_clickarea"
+        android:background="#FF232323">
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_clickarea"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/white"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/white"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/bu_camera"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="20dp"
+                android:layout_weight="1"
+                android:background="#57B5F9"
+                android:onClick="click"
+                android:text="关闭摄像头" />
+
+            <Button
+                android:id="@+id/bu_mic"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="20dp"
+                android:layout_weight="1"
+                android:background="#57B5F9"
+                android:onClick="click"
+                android:text="关闭麦克风" />
+
+            <Button
+                android:id="@+id/bu_switchcrame"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:background="#57B5F9"
+                android:onClick="click"
+                android:text="切换摄像头" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/bu_layout"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="20dp"
+                android:layout_weight="1"
+                android:background="#57B5F9"
+                android:onClick="click"
+                android:text="自适应布局" />
+
+            <Button
+                android:id="@+id/bu_endlive"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="20dp"
+                android:layout_weight="1"
+                android:background="#57B5F9"
+                android:onClick="click"
+                android:text="结束直播" />
+
+            <Button
+                android:id="@+id/bu_requestlive"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:background="#57B5F9"
+                android:onClick="click"
+                android:text="上麦" />
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>

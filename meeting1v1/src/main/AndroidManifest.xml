@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="cn.rongcloud.demo.meeting">
+
+  <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+  <application>
+    <activity
+        android:name="cn.rongcloud.demo.meeting.MeetingPrepareActivity"
+        android:screenOrientation="portrait"
+        android:launchMode="singleTask"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+    <activity
+        android:name="cn.rongcloud.demo.meeting.MeetingActivity"
+        android:launchMode="singleTop"
+        android:screenOrientation="portrait"
+        android:theme="@style/Theme.AppCompat.Light" />
+  </application>
+</manifest>
