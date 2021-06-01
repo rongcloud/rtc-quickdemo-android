@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FF232323"
-    tools:context=".ui.activity.MeetingActivity"
-    android:keepScreenOn="true">
+    android:keepScreenOn="true"
+    tools:context=".ui.activity.MeetingActivity">
 
     <include layout="@layout/layout_meeting_videos" />
 

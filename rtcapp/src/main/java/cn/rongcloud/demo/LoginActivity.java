@@ -15,12 +15,13 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import java.util.ArrayList;
+
 import cn.rongcloud.demo.common.MockAppServer;
 import cn.rongcloud.demo.common.UiUtils;
 import io.rong.imlib.RongIMClient;

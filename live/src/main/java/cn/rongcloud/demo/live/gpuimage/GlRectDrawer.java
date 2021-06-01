@@ -94,17 +94,6 @@ public class GlRectDrawer {
                             0.0f, 1.0f, // Top left.
                             1.0f, 1.0f // Top right.
                     });
-
-    private static class Shader {
-        public final GlShader glShader;
-        public final int texMatrixLocation;
-
-        public Shader(String fragmentShader) {
-            this.glShader = new GlShader(VERTEX_SHADER_STRING, fragmentShader);
-            this.texMatrixLocation = glShader.getUniformLocation("texMatrix");
-        }
-    }
-
     // The keys are one of the fragments shaders above.
     private final Map<String, Shader> shaders = new IdentityHashMap<String, Shader>();
 
@@ -224,5 +213,15 @@ public class GlRectDrawer {
             shader.glShader.release();
         }
         shaders.clear();
+    }
+
+    private static class Shader {
+        public final GlShader glShader;
+        public final int texMatrixLocation;
+
+        public Shader(String fragmentShader) {
+            this.glShader = new GlShader(VERTEX_SHADER_STRING, fragmentShader);
+            this.texMatrixLocation = glShader.getUniformLocation("texMatrix");
+        }
     }
 }

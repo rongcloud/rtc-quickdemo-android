@@ -13,19 +13,6 @@ public class VideoViewWrapper {
     private final String streamId;
     private final String userId;
 
-    public RCRTCVideoView getRCRTCVideoView() {
-        return mRCRTCVideoView;
-    }
-
-    public String getStreamId() {
-        return streamId;
-    }
-
-
-    public String getUserId() {
-        return userId;
-    }
-
     public VideoViewWrapper(String streamId, @NonNull RCRTCVideoView rcrtcVideoView) {
         this(null, streamId, rcrtcVideoView);
     }
@@ -34,5 +21,17 @@ public class VideoViewWrapper {
         mRCRTCVideoView = rcrtcVideoView;
         this.streamId = streamId;
         this.userId = userId;
+    }
+
+    public RCRTCVideoView getRCRTCVideoView() {
+        return mRCRTCVideoView;
+    }
+
+    public String getStreamId() {
+        return streamId;
+    }
+
+    public String getUserId() {
+        return userId;
     }
 }

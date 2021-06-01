@@ -19,13 +19,13 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import cn.rongcloud.demo.live.gpuimage.GPUImageBeautyFilter;
 import cn.rongcloud.demo.live.gpuimage.GPUImageFilter;
@@ -51,22 +51,23 @@ import cn.rongcloud.rtc.base.RTCErrorCode;
  */
 public class LiveActivity extends AppCompatActivity {
 
-    private static final String TAG = "LiveActivity";
-
-    private static final String DEFAULT_FILE_STREAM_NAME = "file:///android_asset/video_1.mp4";
-    private static String mRoomId = "";
     public static final String KEY_ROOM_NUMBER = "room_number";
     public static final String KEY_ROLE = "role_type";
-    private Button mRequestLive;
-    private Button mCamera;
-    private Button mMic;
-    private Button mSwitch;
-    private Button mEndLive;
+    private static final String TAG = "LiveActivity";
+    private static final String DEFAULT_FILE_STREAM_NAME = "file:///android_asset/video_1.mp4";
+    /**
+     * 创建 BeautyFilter 事件
+     */
+    private static final int EVENT_MESSAGE_CREATE_BEAUTY_FILTER = 0;
+    /**
+     * 销毁 Filter 事件
+     */
+    private static final int EVENT_MESSAGE_DESTROY_FILTER = 1;
+    private static String mRoomId = "";
     // 主播sdk调用
     LiveAnchorPresenter mAnchorPresenter;
     // 观众sdk调用
     LiveAudiencePresenter mAudiencePresenter;
-
     /**
      * 当前用户的状态，可以设置为主播和观众
      */
@@ -75,30 +76,32 @@ public class LiveActivity extends AppCompatActivity {
      * 用于切换状态失败时恢复状态的备份变量
      */
     IStatus BakStatus;
-
     FrameLayout flSurfaceContainer;
     VideoViewManager videoViewManager;
-
     Button mMixlayout;
+    IStatus mIdleStatus = new IdleStatus();
+    IStatus mAnchorStatus = new AnchorStatus();
+    IStatus mAudienceStatus = new AudienceStatus();
+    private Button mRequestLive;
+    private Button mCamera;
+    private Button mMic;
+    private Button mSwitch;
+    private Button mEndLive;
     private MenuItem mBeautyMenuItem;
     // 美颜开关状态
     private volatile boolean mBeautyStatus = false;
     private VideoFilterHandler mVideoFilterHandler = null;
-
     private MenuItem mMenuFileStreamItem;
     private MenuItem mMenuUsbStreamItem;
-
-    /**
-     * 推送自定义视频流的状态枚举
-     */
-    enum PushFileStreamStatus {
-        Push,
-        BackDoing,
-        Unpush
-    }
-
     private PushFileStreamStatus mMenuFileStreamStatus = PushFileStreamStatus.Push;
     private PushFileStreamStatus mMenuUsbStreamStatus = PushFileStreamStatus.Push;
+
+    public static void start(Context context, String roomId, int roleType) {
+        Intent intent = new Intent(context, LiveActivity.class);
+        intent.putExtra(KEY_ROOM_NUMBER, roomId);
+        intent.putExtra(KEY_ROLE, roleType);
+        context.startActivity(intent);
+    }
 
     IStatus getCurStatus() {
         return curStatus;
@@ -166,7 +169,298 @@ public class LiveActivity extends AppCompatActivity {
         mAudienceStatus.attach();
     }
 
-    IStatus mIdleStatus = new IdleStatus();
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_live_main);
+        mRequestLive = findViewById(R.id.bu_requestlive);
+        mCamera = findViewById(R.id.bu_camera);
+        mMic = findViewById(R.id.bu_mic);
+        mSwitch = findViewById(R.id.bu_switchcrame);
+        mEndLive = findViewById(R.id.bu_endlive);
+        mMixlayout = findViewById(R.id.bu_layout);
+
+        flSurfaceContainer = findViewById(R.id.surfcecontainer);
+        flSurfaceContainer.post(new Runnable() {
+            @Override
+            public void run() {
+                videoViewManager = new VideoViewManager(flSurfaceContainer, flSurfaceContainer.getWidth(),
+                        flSurfaceContainer.getHeight());
+            }
+        });
+
+        setIdleStatus();
+
+        Intent intent = getIntent();
+        mRoomId = intent.getStringExtra(KEY_ROOM_NUMBER);
+        int type = intent.getIntExtra(KEY_ROLE, RCRTCLiveRole.BROADCASTER.getType());
+
+        mAnchorPresenter = new LiveAnchorPresenter(this);
+        mAudiencePresenter = new LiveAudiencePresenter(this);
+        if (type == RCRTCLiveRole.BROADCASTER.getType()) {
+            setAnchorStatus();
+        } else {
+            setAudienceStatus();
+        }
+        initTitle(type);
+    }
+
+    private void initTitle(int type) {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle((type == RCRTCLiveRole.BROADCASTER.getType() ? "主播端" : "观众端") + ":" + mRoomId);
+        }
+        showBackButton();
+    }
+
+    private void showBackButton() {
+        // 显示返回按钮
+        ActionBar supportActionBar = getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.setHomeButtonEnabled(true);
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        getCurStatus().detach();
+        if (mVideoFilterHandler != null) {
+            mVideoFilterHandler.sendEmptyMessage(EVENT_MESSAGE_DESTROY_FILTER);
+        }
+    }
+
+    public void click(View view) {
+        if (view.getId() == R.id.bu_requestlive) {
+            setAnchorStatus();
+
+        } else if (view.getId() == R.id.bu_endlive) {
+            setAudienceStatus();
+
+        } else if (view.getId() == R.id.bu_camera) {
+            String str = ((Button) view).getText().toString();
+            if (TextUtils.equals(str, AnchorConfig.CAMERA_STATUS_CLOSE)) {
+                RCRTCEngine.getInstance().getDefaultVideoStream().stopCamera();
+                ((Button) view).setText(AnchorConfig.CAMERA_STATUS_OPEN);
+            } else {
+                RCRTCEngine.getInstance().getDefaultVideoStream().startCamera(null);
+
+                ((Button) view).setText(AnchorConfig.CAMERA_STATUS_CLOSE);
+            }
+        } else if (view.getId() == R.id.bu_mic) {
+            String str = ((Button) view).getText().toString();
+            if (TextUtils.equals(str, AnchorConfig.MIC_STATUS_CLOSE)) {
+                RCRTCEngine.getInstance().getDefaultAudioStream().setMicrophoneDisable(true);
+                ((Button) view).setText(AnchorConfig.MIC_STATUS_OPEN);
+            } else {
+                RCRTCEngine.getInstance().getDefaultAudioStream().setMicrophoneDisable(false);
+                ((Button) view).setText(AnchorConfig.MIC_STATUS_CLOSE);
+            }
+        } else if (view.getId() == R.id.bu_switchcrame) {
+            RCRTCEngine.getInstance().getDefaultVideoStream().switchCamera(null);
+        } else if (view.getId() == R.id.bu_layout) {
+            String str = ((Button) view).getText().toString();
+            setMixLayout(str);
+        }
+    }
+
+    private void setMixLayout(String str) {
+        curStatus.mixLayout(str);
+    }
+
+    /**
+     * 标题栏事件响应
+     */
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            // 返回按钮响应事件
+            finish();
+            return true;
+        } else if (item.getItemId() == R.id.beauty_action_btn) {
+            // 响应美颜按钮点击事件
+            handleBeautyStatusChange(!mBeautyStatus);
+        } else if (item.getItemId() == R.id.filestream_action_btn) {
+            if (mMenuFileStreamStatus == PushFileStreamStatus.BackDoing) {
+
+            } else if (mMenuFileStreamStatus == PushFileStreamStatus.Push) {
+                handleMenuFileStreamStatus(PushFileStreamStatus.BackDoing);
+            } else if (mMenuFileStreamStatus == PushFileStreamStatus.Unpush) {
+                handleMenuFileStreamStatus(PushFileStreamStatus.BackDoing);
+            }
+        } else if (item.getItemId() == R.id.usbstream_action_btn) {
+            if (mMenuUsbStreamStatus == PushFileStreamStatus.BackDoing) {
+
+            } else if (mMenuUsbStreamStatus == PushFileStreamStatus.Push) {
+                handleMenuUsbStreamStatus(PushFileStreamStatus.BackDoing);
+            } else if (mMenuUsbStreamStatus == PushFileStreamStatus.Unpush) {
+                handleMenuUsbStreamStatus(PushFileStreamStatus.BackDoing);
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * 处理美颜功能按钮状态改变
+     *
+     * @param beautyStatus
+     */
+    private void handleBeautyStatusChange(boolean beautyStatus) {
+        if (mBeautyMenuItem != null) {
+            mBeautyStatus = beautyStatus;
+            mBeautyMenuItem.setTitle(mBeautyStatus ? "关闭美颜" : "打开美颜");
+        }
+    }
+
+    private void handleMenuUsbStreamStatus(PushFileStreamStatus status) {
+        if (mMenuUsbStreamItem != null) {
+            if (mMenuUsbStreamStatus == PushFileStreamStatus.BackDoing) {
+                if (status == PushFileStreamStatus.BackDoing) {
+                    return;
+                } else if (status == PushFileStreamStatus.Push) {
+                    mMenuUsbStreamStatus = PushFileStreamStatus.Push;
+                    mMenuUsbStreamItem.setTitle("打开usb摄像头");
+                } else if (status == PushFileStreamStatus.Unpush) {
+                    mMenuUsbStreamStatus = PushFileStreamStatus.Unpush;
+                    mMenuUsbStreamItem.setTitle("关闭usb摄像头");
+                }
+            } else if (mMenuUsbStreamStatus == PushFileStreamStatus.Push) {
+                if (status == PushFileStreamStatus.BackDoing) {
+                    curStatus.publishUsbCameraStream();
+                    mMenuUsbStreamStatus = PushFileStreamStatus.BackDoing;
+                    mMenuUsbStreamItem.setTitle("进行中");
+                } else if (status == PushFileStreamStatus.Push) {
+                    return;
+                } else if (status == PushFileStreamStatus.Unpush) {
+                    return;
+                }
+            } else if (mMenuUsbStreamStatus == PushFileStreamStatus.Unpush) {
+                if (status == PushFileStreamStatus.BackDoing) {
+                    curStatus.unpublishUsbCameraStream();
+                    mMenuUsbStreamStatus = PushFileStreamStatus.BackDoing;
+                    mMenuUsbStreamItem.setTitle("进行中");
+                } else if (status == PushFileStreamStatus.Push) {
+                    return;
+                } else if (status == PushFileStreamStatus.Unpush) {
+                    return;
+                }
+            }
+        }
+    }
+
+    private void handleMenuFileStreamStatus(PushFileStreamStatus status) {
+        if (mMenuFileStreamItem != null) {
+            if (mMenuFileStreamStatus == PushFileStreamStatus.BackDoing) {
+                if (status == PushFileStreamStatus.BackDoing) {
+                    return;
+                } else if (status == PushFileStreamStatus.Push) {
+                    mMenuFileStreamStatus = PushFileStreamStatus.Push;
+                    mMenuFileStreamItem.setTitle("发送视频流");
+                } else if (status == PushFileStreamStatus.Unpush) {
+                    mMenuFileStreamStatus = PushFileStreamStatus.Unpush;
+                    mMenuFileStreamItem.setTitle("取消发送视频流");
+                }
+            } else if (mMenuFileStreamStatus == PushFileStreamStatus.Push) {
+                if (status == PushFileStreamStatus.BackDoing) {
+                    curStatus.publishCustomStream(DEFAULT_FILE_STREAM_NAME);
+                    mMenuFileStreamStatus = PushFileStreamStatus.BackDoing;
+                    mMenuFileStreamItem.setTitle("进行中");
+                } else if (status == PushFileStreamStatus.Push) {
+                    return;
+                } else if (status == PushFileStreamStatus.Unpush) {
+                    return;
+                }
+            } else if (mMenuFileStreamStatus == PushFileStreamStatus.Unpush) {
+                if (status == PushFileStreamStatus.BackDoing) {
+                    curStatus.unpublishCustomStream();
+                    mMenuFileStreamStatus = PushFileStreamStatus.BackDoing;
+                    mMenuFileStreamItem.setTitle("进行中");
+                } else if (status == PushFileStreamStatus.Push) {
+                    return;
+                } else if (status == PushFileStreamStatus.Unpush) {
+                    return;
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // 添加 ActionBar 美颜按钮
+        getMenuInflater().inflate(R.menu.beauty_menu, menu);
+        mBeautyMenuItem = menu.findItem(R.id.beauty_action_btn);
+        mMenuFileStreamItem = menu.findItem(R.id.filestream_action_btn);
+        mMenuUsbStreamItem = menu.findItem(R.id.usbstream_action_btn);
+        handleBeautyStatusChange(false);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    /**
+     * 推送自定义视频流的状态枚举
+     */
+    enum PushFileStreamStatus {
+        Push,
+        BackDoing,
+        Unpush
+    }
+
+    /**
+     * 通过该 Handler 确保 Filter 的创建销毁和使用都在同一个线程中，
+     * 避免错误的线程销毁导致 OpenGL 内存泄漏
+     */
+    public static class VideoFilterHandler extends Handler {
+        // 当前的 Filter
+        private GPUImageFilter currentImageFilter = null;
+
+        public VideoFilterHandler(@NonNull Looper looper) {
+            super(looper);
+        }
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case EVENT_MESSAGE_CREATE_BEAUTY_FILTER:
+                    destroyCurrentFilter();
+                    VideoFilterCreateModel model = (VideoFilterCreateModel) msg.obj;
+                    GPUImageFilter gpuImageFilter = new GPUImageBeautyFilter();
+                    gpuImageFilter.draw(model.width, model.height, model.textureId);
+                    currentImageFilter = gpuImageFilter;
+                    break;
+                case EVENT_MESSAGE_DESTROY_FILTER:
+                    destroyCurrentFilter();
+                    removeCallbacksAndMessages(null);
+                    break;
+            }
+        }
+
+        private void destroyCurrentFilter() {
+            if (currentImageFilter != null) {
+                GPUImageFilter imageFilter = this.currentImageFilter;
+                // 立刻置空，防止其他线程获取到一个正在销毁的 Filter
+                currentImageFilter = null;
+                imageFilter.destroy();
+            }
+        }
+
+        @Nullable
+        public GPUImageFilter getCurrentImageFilter() {
+            return currentImageFilter;
+        }
+    }
+
+    private static class VideoFilterCreateModel {
+        int width;
+        int height;
+        int textureId;
+
+        public VideoFilterCreateModel(int width, int height, int textureId) {
+            this.width = width;
+            this.height = height;
+            this.textureId = textureId;
+        }
+    }
 
     class IdleStatus implements IStatus {
 
@@ -588,8 +882,6 @@ public class LiveActivity extends AppCompatActivity {
 
     }
 
-    IStatus mAnchorStatus = new AnchorStatus();
-
     class AudienceStatus implements IStatus, LiveAudiencePresenter.LiveCallback {
 
         @Override
@@ -756,310 +1048,6 @@ public class LiveActivity extends AppCompatActivity {
                     Toast.makeText(LiveActivity.this, ("onUserLeft"), Toast.LENGTH_LONG).show();
                 }
             });
-        }
-    }
-
-    IStatus mAudienceStatus = new AudienceStatus();
-
-    public static void start(Context context, String roomId, int roleType) {
-        Intent intent = new Intent(context, LiveActivity.class);
-        intent.putExtra(KEY_ROOM_NUMBER, roomId);
-        intent.putExtra(KEY_ROLE, roleType);
-        context.startActivity(intent);
-    }
-
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_live_main);
-        mRequestLive = findViewById(R.id.bu_requestlive);
-        mCamera = findViewById(R.id.bu_camera);
-        mMic = findViewById(R.id.bu_mic);
-        mSwitch = findViewById(R.id.bu_switchcrame);
-        mEndLive = findViewById(R.id.bu_endlive);
-        mMixlayout = findViewById(R.id.bu_layout);
-
-        flSurfaceContainer = findViewById(R.id.surfcecontainer);
-        flSurfaceContainer.post(new Runnable() {
-            @Override
-            public void run() {
-                videoViewManager = new VideoViewManager(flSurfaceContainer, flSurfaceContainer.getWidth(),
-                        flSurfaceContainer.getHeight());
-            }
-        });
-
-        setIdleStatus();
-
-        Intent intent = getIntent();
-        mRoomId = intent.getStringExtra(KEY_ROOM_NUMBER);
-        int type = intent.getIntExtra(KEY_ROLE, RCRTCLiveRole.BROADCASTER.getType());
-
-        mAnchorPresenter = new LiveAnchorPresenter(this);
-        mAudiencePresenter = new LiveAudiencePresenter(this);
-        if (type == RCRTCLiveRole.BROADCASTER.getType()) {
-            setAnchorStatus();
-        } else {
-            setAudienceStatus();
-        }
-        initTitle(type);
-    }
-
-    private void initTitle(int type) {
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setTitle((type == RCRTCLiveRole.BROADCASTER.getType() ? "主播端" : "观众端") + ":" + mRoomId);
-        }
-        showBackButton();
-    }
-
-    private void showBackButton() {
-        // 显示返回按钮
-        ActionBar supportActionBar = getSupportActionBar();
-        if (supportActionBar != null) {
-            supportActionBar.setHomeButtonEnabled(true);
-            supportActionBar.setDisplayHomeAsUpEnabled(true);
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        getCurStatus().detach();
-        if (mVideoFilterHandler != null) {
-            mVideoFilterHandler.sendEmptyMessage(EVENT_MESSAGE_DESTROY_FILTER);
-        }
-    }
-
-    public void click(View view) {
-        if (view.getId() == R.id.bu_requestlive) {
-            setAnchorStatus();
-
-        } else if (view.getId() == R.id.bu_endlive) {
-            setAudienceStatus();
-
-        } else if (view.getId() == R.id.bu_camera) {
-            String str = ((Button) view).getText().toString();
-            if (TextUtils.equals(str, AnchorConfig.CAMERA_STATUS_CLOSE)) {
-                RCRTCEngine.getInstance().getDefaultVideoStream().stopCamera();
-                ((Button) view).setText(AnchorConfig.CAMERA_STATUS_OPEN);
-            } else {
-                RCRTCEngine.getInstance().getDefaultVideoStream().startCamera(null);
-
-                ((Button) view).setText(AnchorConfig.CAMERA_STATUS_CLOSE);
-            }
-        } else if (view.getId() == R.id.bu_mic) {
-            String str = ((Button) view).getText().toString();
-            if (TextUtils.equals(str, AnchorConfig.MIC_STATUS_CLOSE)) {
-                RCRTCEngine.getInstance().getDefaultAudioStream().setMicrophoneDisable(true);
-                ((Button) view).setText(AnchorConfig.MIC_STATUS_OPEN);
-            } else {
-                RCRTCEngine.getInstance().getDefaultAudioStream().setMicrophoneDisable(false);
-                ((Button) view).setText(AnchorConfig.MIC_STATUS_CLOSE);
-            }
-        } else if (view.getId() == R.id.bu_switchcrame) {
-            RCRTCEngine.getInstance().getDefaultVideoStream().switchCamera(null);
-        } else if (view.getId() == R.id.bu_layout) {
-            String str = ((Button) view).getText().toString();
-            setMixLayout(str);
-        }
-    }
-
-    private void setMixLayout(String str) {
-        curStatus.mixLayout(str);
-    }
-
-    /**
-     * 标题栏事件响应
-     */
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            // 返回按钮响应事件
-            finish();
-            return true;
-        } else if (item.getItemId() == R.id.beauty_action_btn) {
-            // 响应美颜按钮点击事件
-            handleBeautyStatusChange(!mBeautyStatus);
-        } else if (item.getItemId() == R.id.filestream_action_btn) {
-            if (mMenuFileStreamStatus == PushFileStreamStatus.BackDoing) {
-
-            } else if (mMenuFileStreamStatus == PushFileStreamStatus.Push) {
-                handleMenuFileStreamStatus(PushFileStreamStatus.BackDoing);
-            } else if (mMenuFileStreamStatus == PushFileStreamStatus.Unpush) {
-                handleMenuFileStreamStatus(PushFileStreamStatus.BackDoing);
-            }
-        } else if (item.getItemId() == R.id.usbstream_action_btn) {
-            if (mMenuUsbStreamStatus == PushFileStreamStatus.BackDoing) {
-
-            } else if (mMenuUsbStreamStatus == PushFileStreamStatus.Push) {
-                handleMenuUsbStreamStatus(PushFileStreamStatus.BackDoing);
-            } else if (mMenuUsbStreamStatus == PushFileStreamStatus.Unpush) {
-                handleMenuUsbStreamStatus(PushFileStreamStatus.BackDoing);
-            }
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * 处理美颜功能按钮状态改变
-     *
-     * @param beautyStatus
-     */
-    private void handleBeautyStatusChange(boolean beautyStatus) {
-        if (mBeautyMenuItem != null) {
-            mBeautyStatus = beautyStatus;
-            mBeautyMenuItem.setTitle(mBeautyStatus ? "关闭美颜" : "打开美颜");
-        }
-    }
-
-    private void handleMenuUsbStreamStatus(PushFileStreamStatus status) {
-        if (mMenuUsbStreamItem != null) {
-            if (mMenuUsbStreamStatus == PushFileStreamStatus.BackDoing) {
-                if (status == PushFileStreamStatus.BackDoing) {
-                    return;
-                } else if (status == PushFileStreamStatus.Push) {
-                    mMenuUsbStreamStatus = PushFileStreamStatus.Push;
-                    mMenuUsbStreamItem.setTitle("打开usb摄像头");
-                } else if (status == PushFileStreamStatus.Unpush) {
-                    mMenuUsbStreamStatus = PushFileStreamStatus.Unpush;
-                    mMenuUsbStreamItem.setTitle("关闭usb摄像头");
-                }
-            } else if (mMenuUsbStreamStatus == PushFileStreamStatus.Push) {
-                if (status == PushFileStreamStatus.BackDoing) {
-                    curStatus.publishUsbCameraStream();
-                    mMenuUsbStreamStatus = PushFileStreamStatus.BackDoing;
-                    mMenuUsbStreamItem.setTitle("进行中");
-                } else if (status == PushFileStreamStatus.Push) {
-                    return;
-                } else if (status == PushFileStreamStatus.Unpush) {
-                    return;
-                }
-            } else if (mMenuUsbStreamStatus == PushFileStreamStatus.Unpush) {
-                if (status == PushFileStreamStatus.BackDoing) {
-                    curStatus.unpublishUsbCameraStream();
-                    mMenuUsbStreamStatus = PushFileStreamStatus.BackDoing;
-                    mMenuUsbStreamItem.setTitle("进行中");
-                } else if (status == PushFileStreamStatus.Push) {
-                    return;
-                } else if (status == PushFileStreamStatus.Unpush) {
-                    return;
-                }
-            }
-        }
-    }
-
-    private void handleMenuFileStreamStatus(PushFileStreamStatus status) {
-        if (mMenuFileStreamItem != null) {
-            if (mMenuFileStreamStatus == PushFileStreamStatus.BackDoing) {
-                if (status == PushFileStreamStatus.BackDoing) {
-                    return;
-                } else if (status == PushFileStreamStatus.Push) {
-                    mMenuFileStreamStatus = PushFileStreamStatus.Push;
-                    mMenuFileStreamItem.setTitle("发送视频流");
-                } else if (status == PushFileStreamStatus.Unpush) {
-                    mMenuFileStreamStatus = PushFileStreamStatus.Unpush;
-                    mMenuFileStreamItem.setTitle("取消发送视频流");
-                }
-            } else if (mMenuFileStreamStatus == PushFileStreamStatus.Push) {
-                if (status == PushFileStreamStatus.BackDoing) {
-                    curStatus.publishCustomStream(DEFAULT_FILE_STREAM_NAME);
-                    mMenuFileStreamStatus = PushFileStreamStatus.BackDoing;
-                    mMenuFileStreamItem.setTitle("进行中");
-                } else if (status == PushFileStreamStatus.Push) {
-                    return;
-                } else if (status == PushFileStreamStatus.Unpush) {
-                    return;
-                }
-            } else if (mMenuFileStreamStatus == PushFileStreamStatus.Unpush) {
-                if (status == PushFileStreamStatus.BackDoing) {
-                    curStatus.unpublishCustomStream();
-                    mMenuFileStreamStatus = PushFileStreamStatus.BackDoing;
-                    mMenuFileStreamItem.setTitle("进行中");
-                } else if (status == PushFileStreamStatus.Push) {
-                    return;
-                } else if (status == PushFileStreamStatus.Unpush) {
-                    return;
-                }
-            }
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // 添加 ActionBar 美颜按钮
-        getMenuInflater().inflate(R.menu.beauty_menu, menu);
-        mBeautyMenuItem = menu.findItem(R.id.beauty_action_btn);
-        mMenuFileStreamItem = menu.findItem(R.id.filestream_action_btn);
-        mMenuUsbStreamItem = menu.findItem(R.id.usbstream_action_btn);
-        handleBeautyStatusChange(false);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-
-    /**
-     * 创建 BeautyFilter 事件
-     */
-    private static final int EVENT_MESSAGE_CREATE_BEAUTY_FILTER = 0;
-    /**
-     * 销毁 Filter 事件
-     */
-    private static final int EVENT_MESSAGE_DESTROY_FILTER = 1;
-
-    /**
-     * 通过该 Handler 确保 Filter 的创建销毁和使用都在同一个线程中，
-     * 避免错误的线程销毁导致 OpenGL 内存泄漏
-     */
-    public static class VideoFilterHandler extends Handler {
-        // 当前的 Filter
-        private GPUImageFilter currentImageFilter = null;
-
-        public VideoFilterHandler(@NonNull Looper looper) {
-            super(looper);
-        }
-
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case EVENT_MESSAGE_CREATE_BEAUTY_FILTER:
-                    destroyCurrentFilter();
-                    VideoFilterCreateModel model = (VideoFilterCreateModel) msg.obj;
-                    GPUImageFilter gpuImageFilter = new GPUImageBeautyFilter();
-                    gpuImageFilter.draw(model.width, model.height, model.textureId);
-                    currentImageFilter = gpuImageFilter;
-                    break;
-                case EVENT_MESSAGE_DESTROY_FILTER:
-                    destroyCurrentFilter();
-                    removeCallbacksAndMessages(null);
-                    break;
-            }
-        }
-
-        private void destroyCurrentFilter() {
-            if (currentImageFilter != null) {
-                GPUImageFilter imageFilter = this.currentImageFilter;
-                // 立刻置空，防止其他线程获取到一个正在销毁的 Filter
-                currentImageFilter = null;
-                imageFilter.destroy();
-            }
-        }
-
-        @Nullable
-        public GPUImageFilter getCurrentImageFilter() {
-            return currentImageFilter;
-        }
-    }
-
-    private static class VideoFilterCreateModel {
-        int width;
-        int height;
-        int textureId;
-
-        public VideoFilterCreateModel(int width, int height, int textureId) {
-            this.width = width;
-            this.height = height;
-            this.textureId = textureId;
         }
     }
 }

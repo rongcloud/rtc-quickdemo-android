@@ -1,8 +1,13 @@
 # RongCloud-RTC Android Quick Demo
 
+
+# 融云场景 Demo
+包含单群聊、音视频通话、语音聊天室、娱乐直播、教学课堂、多人会议等场景
+https://www.rongcloud.cn/downloads/demo
+
 融云音视频 Android 端快速集成示例源码。
 
-一个工程共包含两个 App 及多个相关模块，具体如下：
+包含以下示例：
 
 | 名称        | 类型   | 依赖 SDK | 简介                                                      |
 | ----------- | ------ | -------- | --------------------------------------------------------- |
@@ -15,4 +20,3 @@
 | calllib     | Module | CallLib  | 不带 UI 的呼叫功能展示                                    |
 | callkit     | Module | CallKit  | 带 UI 的呼叫功能展示                                      |
 
-编译运行前，请将各自 App 里 DemoApplication.java 中的 `APP_KEY` 和 `APP_SECRET` 改成在融云开发者后台申请的值。

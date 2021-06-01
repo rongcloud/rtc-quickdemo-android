@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -33,9 +32,6 @@ public class HomeActivity extends AppCompatActivity {
 
     private static final String TAG = HomeActivity.class.getName();
 
-    private static final String KEY_USER_ID = "USER_ID";
-    private String mUserId = "";
-    private TextView mUserIdTextView = null;
     private RecyclerView mRvList;
     private HomeListAdapter mAdapter;
 
@@ -43,11 +39,6 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-
-//        Intent intent = getIntent();
-//        mUserId = intent.getStringExtra(KEY_USER_ID);
-//        mUserIdTextView = findViewById(R.id.tv_userid);
-//        mUserIdTextView.setText(mUserIdTextView.getText() + mUserId);
 
         initView();
         initData();

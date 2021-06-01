@@ -28,8 +28,8 @@
         </activity>
         <activity
             android:name=".HomeActivity"
-            android:screenOrientation="portrait"
             android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light" />
     </application>
 

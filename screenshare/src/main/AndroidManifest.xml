@@ -9,14 +9,14 @@
 
         <activity
             android:name=".ui.activity.MeetingActivity"
-            android:theme="@style/Theme.AppCompat.Light"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light" />
 
         <activity
             android:name=".ui.activity.CreateMeetingActivity"
-            android:theme="@style/Theme.AppCompat.Light"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light" />
 
         <service
             android:name=".service.ScreenCastService"

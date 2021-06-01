@@ -18,11 +18,12 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import androidx.appcompat.app.AppCompatActivity;
 import cn.rongcloud.demo.calllib.R;
 import io.rong.calllib.IRongCallListener;
 import io.rong.calllib.IRongReceivedCallListener;
@@ -34,13 +35,7 @@ import io.rong.imlib.model.Conversation;
 public class CalllibActivity extends AppCompatActivity {
 
 
-    enum CallStatus {
-        Idle,
-        Calling,
-        BeCall,
-        OnCall
-    }
-
+    private static final String TAG = "CalllibActivity";
     private static CallStatus currentStatus = CallStatus.Idle;
 
 
@@ -52,81 +47,7 @@ public class CalllibActivity extends AppCompatActivity {
     private Button hangUpButton;
     private EditText idInputEditText;
     private TextView statusTextView;
-
-
-    private static final String TAG = "CalllibActivity";
-
-    public static void start(Context context) {
-        Intent intent = new Intent(context, CalllibActivity.class);
-        context.startActivity(intent);
-    }
-
-    private void changeUi() {
-        if (CallStatus.Idle == currentStatus) {
-            callButton.setVisibility(View.VISIBLE);
-            statusTextView.setText("");
-            acceptButton.setVisibility(View.INVISIBLE);
-            hangUpButton.setVisibility(View.INVISIBLE);
-        } else if (CallStatus.Calling == currentStatus) {
-            callButton.setVisibility(View.INVISIBLE);
-            statusTextView.setText("呼叫中");
-            hangUpButton.setVisibility(View.VISIBLE);
-            acceptButton.setVisibility(View.INVISIBLE);
-        } else if (CallStatus.BeCall == currentStatus) {
-            callButton.setVisibility(View.INVISIBLE);
-            statusTextView.setText("有人找你");
-            hangUpButton.setVisibility(View.VISIBLE);
-            acceptButton.setVisibility(View.VISIBLE);
-        } else if (CallStatus.OnCall == currentStatus) {
-            callButton.setVisibility(View.INVISIBLE);
-            statusTextView.setText("通话中");
-            hangUpButton.setVisibility(View.VISIBLE);
-            acceptButton.setVisibility(View.INVISIBLE);
-        }
-    }
-
-    private void initUi() {
-        local = findViewById(R.id.local);
-        remote = findViewById(R.id.remote);
-
-        idInputEditText = findViewById(R.id.et_userId);
-        statusTextView = findViewById(R.id.tv_status);
-        callButton = findViewById(R.id.call);
-        acceptButton = findViewById(R.id.accept);
-        hangUpButton = findViewById(R.id.hang_up);
-
-        callButton.setOnClickListener(onClickListener);
-        acceptButton.setOnClickListener(onClickListener);
-        hangUpButton.setOnClickListener(onClickListener);
-    }
-
-    private void registerCallListener() {
-        RongCallClient.setReceivedCallListener(receivedCallListener);
-        RongCallClient.getInstance().setVoIPCallListener(callListener);
-    }
-
-    private void unRegisterCallListener() {
-        RongCallClient.setReceivedCallListener(null);
-        RongCallClient.getInstance().setVoIPCallListener(null);
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_call_main);
-
-        initUi();
-        changeUi();
-        registerCallListener();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unRegisterCallListener();
-    }
-
-    private View.OnClickListener onClickListener = new View.OnClickListener(){
+    private View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             int id = v.getId();
@@ -139,34 +60,6 @@ public class CalllibActivity extends AppCompatActivity {
             }
         }
     };
-
-    private void call() {
-        Conversation.ConversationType conversationType = Conversation.ConversationType.PRIVATE;
-        String targetId = idInputEditText.getText().toString().trim();
-        if (TextUtils.isEmpty(targetId)) {
-            Toast.makeText(this, "请输入userid", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        List<String> userIds = new ArrayList<>();
-        userIds.add(targetId);
-        RongCallCommon.CallMediaType mediaType = RongCallCommon.CallMediaType.VIDEO;
-        String extra = "";
-        RongCallClient.getInstance().startCall(conversationType, targetId, userIds, null, mediaType, extra);
-    }
-
-    private void acceptCall() {
-        if (RongCallClient.getInstance() != null && RongCallClient.getInstance().getCallSession() != null) {
-            RongCallClient.getInstance().acceptCall(RongCallClient.getInstance().getCallSession().getCallId());
-        }
-    }
-
-    private void hangUpCall() {
-        if (RongCallClient.getInstance() != null && RongCallClient.getInstance().getCallSession() != null) {
-            RongCallClient.getInstance().hangUpCall(RongCallClient.getInstance().getCallSession().getCallId());
-        }
-    }
-
     private IRongReceivedCallListener receivedCallListener = new IRongReceivedCallListener() {
 
         @Override
@@ -181,7 +74,6 @@ public class CalllibActivity extends AppCompatActivity {
             changeUi();
         }
     };
-
     private IRongCallListener callListener = new IRongCallListener() {
 
         private void addLocalView(SurfaceView view) {
@@ -347,4 +239,108 @@ public class CalllibActivity extends AppCompatActivity {
             Log.d(TAG, "onAudioLevelReceive levels = " + levels);
         }
     };
+
+    public static void start(Context context) {
+        Intent intent = new Intent(context, CalllibActivity.class);
+        context.startActivity(intent);
+    }
+
+    private void changeUi() {
+        if (CallStatus.Idle == currentStatus) {
+            callButton.setVisibility(View.VISIBLE);
+            statusTextView.setText("");
+            acceptButton.setVisibility(View.INVISIBLE);
+            hangUpButton.setVisibility(View.INVISIBLE);
+        } else if (CallStatus.Calling == currentStatus) {
+            callButton.setVisibility(View.INVISIBLE);
+            statusTextView.setText("呼叫中");
+            hangUpButton.setVisibility(View.VISIBLE);
+            acceptButton.setVisibility(View.INVISIBLE);
+        } else if (CallStatus.BeCall == currentStatus) {
+            callButton.setVisibility(View.INVISIBLE);
+            statusTextView.setText("有人找你");
+            hangUpButton.setVisibility(View.VISIBLE);
+            acceptButton.setVisibility(View.VISIBLE);
+        } else if (CallStatus.OnCall == currentStatus) {
+            callButton.setVisibility(View.INVISIBLE);
+            statusTextView.setText("通话中");
+            hangUpButton.setVisibility(View.VISIBLE);
+            acceptButton.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void initUi() {
+        local = findViewById(R.id.local);
+        remote = findViewById(R.id.remote);
+
+        idInputEditText = findViewById(R.id.et_userId);
+        statusTextView = findViewById(R.id.tv_status);
+        callButton = findViewById(R.id.call);
+        acceptButton = findViewById(R.id.accept);
+        hangUpButton = findViewById(R.id.hang_up);
+
+        callButton.setOnClickListener(onClickListener);
+        acceptButton.setOnClickListener(onClickListener);
+        hangUpButton.setOnClickListener(onClickListener);
+    }
+
+    private void registerCallListener() {
+        RongCallClient.setReceivedCallListener(receivedCallListener);
+        RongCallClient.getInstance().setVoIPCallListener(callListener);
+    }
+
+    private void unRegisterCallListener() {
+        RongCallClient.setReceivedCallListener(null);
+        RongCallClient.getInstance().setVoIPCallListener(null);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_call_main);
+
+        initUi();
+        changeUi();
+        registerCallListener();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unRegisterCallListener();
+    }
+
+    private void call() {
+        Conversation.ConversationType conversationType = Conversation.ConversationType.PRIVATE;
+        String targetId = idInputEditText.getText().toString().trim();
+        if (TextUtils.isEmpty(targetId)) {
+            Toast.makeText(this, "请输入userid", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        List<String> userIds = new ArrayList<>();
+        userIds.add(targetId);
+        RongCallCommon.CallMediaType mediaType = RongCallCommon.CallMediaType.VIDEO;
+        String extra = "";
+        RongCallClient.getInstance().startCall(conversationType, targetId, userIds, null, mediaType, extra);
+    }
+
+    private void acceptCall() {
+        if (RongCallClient.getInstance() != null && RongCallClient.getInstance().getCallSession() != null) {
+            RongCallClient.getInstance().acceptCall(RongCallClient.getInstance().getCallSession().getCallId());
+        }
+    }
+
+    private void hangUpCall() {
+        if (RongCallClient.getInstance() != null && RongCallClient.getInstance().getCallSession() != null) {
+            RongCallClient.getInstance().hangUpCall(RongCallClient.getInstance().getCallSession().getCallId());
+        }
+    }
+
+    enum CallStatus {
+        Idle,
+        Calling,
+        BeCall,
+        OnCall
+    }
 }

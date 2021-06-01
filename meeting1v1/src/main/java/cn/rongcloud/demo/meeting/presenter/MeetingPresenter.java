@@ -27,29 +27,81 @@ import cn.rongcloud.rtc.base.RTCErrorCode;
  */
 public class MeetingPresenter {
 
-    private RCRTCRoom mRtcRoom = null;
     MeetingCallback mMeetingCallback = null;
+    private RCRTCRoom mRtcRoom = null;
+    private final IRCRTCRoomEventsListener roomEventsListener = new IRCRTCRoomEventsListener() {
+        /**
+         * 房间内用户发布资源
+         *
+         * @param rcrtcRemoteUser 远端用户
+         * @param list    发布的资源
+         */
+        @Override
+        public void onRemoteUserPublishResource(RCRTCRemoteUser rcrtcRemoteUser, final List<RCRTCInputStream> list) {
+            subscribeAVStream();
+        }
 
-    /**
-     * activity相关回调
-     */
-    public interface MeetingCallback {
-        void onJoinRoomSuccess(RCRTCRoom rcrtcRoom);
+        @Override
+        public void onRemoteUserMuteAudio(RCRTCRemoteUser rcrtcRemoteUser, RCRTCInputStream rcrtcInputStream, boolean b) {
+        }
 
-        void onJoinRoomFailed(RTCErrorCode rtcErrorCode);
+        @Override
+        public void onRemoteUserMuteVideo(RCRTCRemoteUser rcrtcRemoteUser, RCRTCInputStream rcrtcInputStream, boolean b) {
+        }
 
-        void onPublishSuccess();
 
-        void onPublishFailed();
+        @Override
+        public void onRemoteUserUnpublishResource(RCRTCRemoteUser rcrtcRemoteUser, List<RCRTCInputStream> list) {
+        }
 
-        void onSubscribeSuccess(List<RCRTCInputStream> inputStreamList);
+        /**
+         * 用户加入房间
+         *
+         * @param rcrtcRemoteUser 远端用户
+         */
+        @Override
+        public void onUserJoined(final RCRTCRemoteUser rcrtcRemoteUser) {
+            try {
+                getView().onUserJoined(rcrtcRemoteUser);
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+            }
+        }
 
-        void onSubscribeFailed();
+        /**
+         * 用户离开房间
+         *
+         * @param rcrtcRemoteUser 远端用户
+         */
+        @Override
+        public void onUserLeft(RCRTCRemoteUser rcrtcRemoteUser) {
+            try {
+                getView().onUserLeft(rcrtcRemoteUser);
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+            }
+        }
 
-        void onUserJoined(RCRTCRemoteUser rcrtcRemoteUser);
+        @Override
+        public void onUserOffline(RCRTCRemoteUser rcrtcRemoteUser) {
+        }
 
-        void onUserLeft(RCRTCRemoteUser rcrtcRemoteUser);
-    }
+        @Override
+        public void onPublishLiveStreams(List<RCRTCInputStream> list) {
+        }
+
+        @Override
+        public void onUnpublishLiveStreams(List<RCRTCInputStream> list) {
+        }
+
+        /**
+         * 自己退出房间。 例如断网退出等
+         * @param i 状态码
+         */
+        @Override
+        public void onLeaveRoom(int i) {
+        }
+    };
 
     protected MeetingCallback getView() {
         if (mMeetingCallback == null) {
@@ -214,80 +266,6 @@ public class MeetingPresenter {
         });
     }
 
-    private IRCRTCRoomEventsListener roomEventsListener = new IRCRTCRoomEventsListener() {
-        /**
-         * 房间内用户发布资源
-         *
-         * @param rcrtcRemoteUser 远端用户
-         * @param list    发布的资源
-         */
-        @Override
-        public void onRemoteUserPublishResource(RCRTCRemoteUser rcrtcRemoteUser, final List<RCRTCInputStream> list) {
-            subscribeAVStream();
-        }
-
-        @Override
-        public void onRemoteUserMuteAudio(RCRTCRemoteUser rcrtcRemoteUser, RCRTCInputStream rcrtcInputStream, boolean b) {
-        }
-
-        @Override
-        public void onRemoteUserMuteVideo(RCRTCRemoteUser rcrtcRemoteUser, RCRTCInputStream rcrtcInputStream, boolean b) {
-        }
-
-
-        @Override
-        public void onRemoteUserUnpublishResource(RCRTCRemoteUser rcrtcRemoteUser, List<RCRTCInputStream> list) {
-        }
-
-        /**
-         * 用户加入房间
-         *
-         * @param rcrtcRemoteUser 远端用户
-         */
-        @Override
-        public void onUserJoined(final RCRTCRemoteUser rcrtcRemoteUser) {
-            try {
-                getView().onUserJoined(rcrtcRemoteUser);
-            } catch (IllegalStateException e) {
-                e.printStackTrace();
-            }
-        }
-
-        /**
-         * 用户离开房间
-         *
-         * @param rcrtcRemoteUser 远端用户
-         */
-        @Override
-        public void onUserLeft(RCRTCRemoteUser rcrtcRemoteUser) {
-            try {
-                getView().onUserLeft(rcrtcRemoteUser);
-            } catch (IllegalStateException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void onUserOffline(RCRTCRemoteUser rcrtcRemoteUser) {
-        }
-
-        @Override
-        public void onPublishLiveStreams(List<RCRTCInputStream> list) {
-        }
-
-        @Override
-        public void onUnpublishLiveStreams(List<RCRTCInputStream> list) {
-        }
-
-        /**
-         * 自己退出房间。 例如断网退出等
-         * @param i 状态码
-         */
-        @Override
-        public void onLeaveRoom(int i) {
-        }
-    };
-
     public void leaveRoom() {
         RCRTCEngine.getInstance().leaveRoom(new IRCRTCResultCallback() {
             @Override
@@ -298,5 +276,26 @@ public class MeetingPresenter {
             public void onSuccess() {
             }
         });
+    }
+
+    /**
+     * activity相关回调
+     */
+    public interface MeetingCallback {
+        void onJoinRoomSuccess(RCRTCRoom rcrtcRoom);
+
+        void onJoinRoomFailed(RTCErrorCode rtcErrorCode);
+
+        void onPublishSuccess();
+
+        void onPublishFailed();
+
+        void onSubscribeSuccess(List<RCRTCInputStream> inputStreamList);
+
+        void onSubscribeFailed();
+
+        void onUserJoined(RCRTCRemoteUser rcrtcRemoteUser);
+
+        void onUserLeft(RCRTCRemoteUser rcrtcRemoteUser);
     }
 }

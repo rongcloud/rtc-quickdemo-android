@@ -17,14 +17,10 @@ import cn.rongcloud.rtc.base.RCRTCStream;
  * TODO 参考主播合流布局设置文档：https://docs.rongcloud.cn/v4/views/rtc/livevideo/guide/anchorManage/layout/android.html#layout
  */
 public class RTCMixLayout {
-    // 是否裁减画布
-    private static boolean isCrop = true;
     private static final String TAG = "RTCMixLayout";
     private static final int MARGIN = 10;
-
-    private static class holder {
-        static RTCMixLayout layout = new RTCMixLayout();
-    }
+    // 是否裁减画布
+    private static boolean isCrop = true;
 
     private RTCMixLayout() {
     }
@@ -152,7 +148,6 @@ public class RTCMixLayout {
         return config;
     }
 
-
     private CustomLayout single(CustomLayout videoLayout, int i, int width, int height) {
         videoLayout.setX(0);
         videoLayout.setY(0);
@@ -239,6 +234,10 @@ public class RTCMixLayout {
                 break;
         }
         return videoLayout;
+    }
+
+    private static class holder {
+        static RTCMixLayout layout = new RTCMixLayout();
     }
 }
 

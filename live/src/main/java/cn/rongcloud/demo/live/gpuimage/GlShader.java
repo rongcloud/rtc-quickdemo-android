@@ -12,30 +12,6 @@ import java.nio.FloatBuffer;
 // Helper class for handling OpenGL shaders and shader programs.
 public class GlShader {
     private static final String TAG = "GlShader";
-
-    private static int compileShader(int shaderType, String source) {
-        final int shader = GLES20.glCreateShader(shaderType);
-        if (shader == 0) {
-            throw new RuntimeException(
-                    "glCreateShader() failed. GLES20 error: " + GLES20.glGetError());
-        }
-        GLES20.glShaderSource(shader, source);
-        GLES20.glCompileShader(shader);
-        int[] compileStatus = new int[]{GLES20.GL_FALSE};
-        GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compileStatus, 0);
-        if (compileStatus[0] != GLES20.GL_TRUE) {
-            Log.e(
-                    TAG,
-                    "Could not compile shader "
-                            + shaderType
-                            + ":"
-                            + GLES20.glGetShaderInfoLog(shader));
-            throw new RuntimeException(GLES20.glGetShaderInfoLog(shader));
-        }
-        GlUtil.checkNoGLES2Error("compileShader");
-        return shader;
-    }
-
     private int program;
 
     public GlShader(String vertexSource, String fragmentSource) {
@@ -70,6 +46,29 @@ public class GlShader {
         GLES20.glDeleteShader(vertexShader);
         GLES20.glDeleteShader(fragmentShader);
         GlUtil.checkNoGLES2Error("Creating GlShader");
+    }
+
+    private static int compileShader(int shaderType, String source) {
+        final int shader = GLES20.glCreateShader(shaderType);
+        if (shader == 0) {
+            throw new RuntimeException(
+                    "glCreateShader() failed. GLES20 error: " + GLES20.glGetError());
+        }
+        GLES20.glShaderSource(shader, source);
+        GLES20.glCompileShader(shader);
+        int[] compileStatus = new int[]{GLES20.GL_FALSE};
+        GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compileStatus, 0);
+        if (compileStatus[0] != GLES20.GL_TRUE) {
+            Log.e(
+                    TAG,
+                    "Could not compile shader "
+                            + shaderType
+                            + ":"
+                            + GLES20.glGetShaderInfoLog(shader));
+            throw new RuntimeException(GLES20.glGetShaderInfoLog(shader));
+        }
+        GlUtil.checkNoGLES2Error("compileShader");
+        return shader;
     }
 
     public int getAttribLocation(String label) {

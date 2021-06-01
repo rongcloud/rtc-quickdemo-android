@@ -777,6 +777,10 @@ public class MeetingActivity extends AppCompatActivity {
         }
     }
 
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
     /**
      * 房间事件回调
      */
@@ -919,10 +923,6 @@ public class MeetingActivity extends AppCompatActivity {
         public void onLeaveRoom(int i) {
 
         }
-    }
-
-    private void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
 }

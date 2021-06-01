@@ -79,6 +79,41 @@ public abstract class GPUImageFilter {
         glRectDrawer = new GlRectDrawer();
     }
 
+    public static final float[] identityMatrix() {
+        return new float[]{
+                1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 1, 0,
+                0, 0, 0, 1
+        };
+    }
+
+    // Matrix with transform y' = 1 - y.
+    public static final float[] verticalFlipMatrix() {
+        return new float[]{
+                1, 0, 0, 0,
+                0, -1, 0, 0,
+                0, 0, 1, 0,
+                0, 1, 0, 1
+        };
+    }
+
+    // Matrix with transform x' = 1 - x.
+    public static final float[] horizontalFlipMatrix() {
+        return new float[]{
+                -1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 1, 0,
+                1, 0, 0, 1
+        };
+    }
+
+    public static float[] multiplyMatrices(float[] a, float[] b) {
+        final float[] resultMatrix = new float[16];
+        Matrix.multiplyMM(resultMatrix, 0, a, 0, b, 0);
+        return resultMatrix;
+    }
+
     public final void init() {
         onInit();
         mIsInitialized = true;
@@ -285,41 +320,6 @@ public abstract class GPUImageFilter {
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
 
         return textureFilter.getTextureId();
-    }
-
-    public static final float[] identityMatrix() {
-        return new float[]{
-                1, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 0, 1, 0,
-                0, 0, 0, 1
-        };
-    }
-
-    // Matrix with transform y' = 1 - y.
-    public static final float[] verticalFlipMatrix() {
-        return new float[]{
-                1, 0, 0, 0,
-                0, -1, 0, 0,
-                0, 0, 1, 0,
-                0, 1, 0, 1
-        };
-    }
-
-    // Matrix with transform x' = 1 - x.
-    public static final float[] horizontalFlipMatrix() {
-        return new float[]{
-                -1, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 0, 1, 0,
-                1, 0, 0, 1
-        };
-    }
-
-    public static float[] multiplyMatrices(float[] a, float[] b) {
-        final float[] resultMatrix = new float[16];
-        Matrix.multiplyMM(resultMatrix, 0, a, 0, b, 0);
-        return resultMatrix;
     }
 
     abstract GPUImageFilter getFilter();

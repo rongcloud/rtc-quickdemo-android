@@ -15,11 +15,10 @@ import static cn.rongcloud.rtc.core.RendererCommon.ScalingType.SCALE_ASPECT_FILL
 public class VideoViewManager {
 
     private static final String TAG = "VideoViewManager";
-    private FrameLayout flSurfaceContainer;
-    private Map<String, RCRTCVideoView> linkedHashMap = new LinkedHashMap<>();
-
     ArrayList<RCRTCVideoView> arrayListVideoView;
     int mWidth, mHeight;
+    private FrameLayout flSurfaceContainer;
+    private Map<String, RCRTCVideoView> linkedHashMap = new LinkedHashMap<>();
 
     public VideoViewManager(FrameLayout surfaceContainer, int width, int height) {
         flSurfaceContainer = surfaceContainer;

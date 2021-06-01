@@ -13,11 +13,12 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.List;
+
 import cn.rongcloud.demo.meeting.presenter.MeetingPresenter;
 import cn.rongcloud.rtc.api.RCRTCEngine;
 import cn.rongcloud.rtc.api.RCRTCRemoteUser;
@@ -33,18 +34,19 @@ import cn.rongcloud.rtc.base.RTCErrorCode;
  */
 public class MeetingActivity extends AppCompatActivity implements MeetingPresenter.MeetingCallback {
 
+    public static final String KEY_ROOM_NUMBER = "room_number";
+    public static final String KEY_IS_ENCRYPTION = "KEY_IS_ENCRYPTION";
+    private static String mRoomId = "";
+
     static {
         // 加载加密所使用的 so 库
         System.loadLibrary("custom_frame_crypto");
     }
 
-    private static String mRoomId = "";
-    private boolean isEncryption = false;
-    public static final String KEY_ROOM_NUMBER = "room_number";
-    public static final String KEY_IS_ENCRYPTION = "KEY_IS_ENCRYPTION";
-    //本地预览 远端用户 全屏显示 videoview
-    private FrameLayout mFlLocalUser, mFlRemoteUser, mFlFull;
     MeetingPresenter mMeetingPresenter;
+    private boolean isEncryption = false;
+    //本地预览远端用户，全屏显示 videoview
+    private FrameLayout mFlLocalUser, mFlRemoteUser, mFlFull;
 
     public static void start(Context context, String roomId, boolean isEncryption) {
         Intent intent = new Intent(context, MeetingActivity.class);
@@ -57,9 +59,9 @@ public class MeetingActivity extends AppCompatActivity implements MeetingPresent
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meeting1_v1_main);
-        mFlLocalUser = (FrameLayout) findViewById(R.id.local_user);
-        mFlRemoteUser = (FrameLayout) findViewById(R.id.remote_user);
-        mFlFull = (FrameLayout) findViewById(R.id.fl_fullscreen);
+        mFlLocalUser = findViewById(R.id.local_user);
+        mFlRemoteUser = findViewById(R.id.remote_user);
+        mFlFull = findViewById(R.id.fl_fullscreen);
 
         Intent intent = getIntent();
         mRoomId = intent.getStringExtra(KEY_ROOM_NUMBER);
@@ -106,17 +108,6 @@ public class MeetingActivity extends AppCompatActivity implements MeetingPresent
         }
     }
 
-    /**
-     * 继承RCRTCVideoView,可以重写RCRTCVideoView方法定制特殊需求，
-     * 例如本例中重写onTouchEvent实现点击全屏
-     */
-    class MeetVideoView extends RCRTCVideoView {
-        public MeetVideoView(Context context) {
-            super(context);
-            this.setTag(MeetVideoView.class.getName());
-        }
-    }
-
     @Override
     public void onJoinRoomSuccess(RCRTCRoom rcrtcRoom) {
         // 加入房间成功，设置本地用户显示的view，ui线程执行
@@ -136,12 +127,6 @@ public class MeetingActivity extends AppCompatActivity implements MeetingPresent
                                     mFlFull.removeView(this);
                                     mFlLocalUser.addView(this);
                                 }
-                                break;
-                            case MotionEvent.ACTION_MOVE:
-                                break;
-                            case MotionEvent.ACTION_CANCEL:
-                                break;
-                            case MotionEvent.ACTION_UP:
                                 break;
                             default:
                                 break;
@@ -193,12 +178,6 @@ public class MeetingActivity extends AppCompatActivity implements MeetingPresent
                                     mFlRemoteUser.addView(this);
                                 }
                                 break;
-                            case MotionEvent.ACTION_MOVE:
-                                break;
-                            case MotionEvent.ACTION_CANCEL:
-                                break;
-                            case MotionEvent.ACTION_UP:
-                                break;
                             default:
                                 break;
                         }
@@ -240,11 +219,11 @@ public class MeetingActivity extends AppCompatActivity implements MeetingPresent
             public void run() {
                 RCRTCVideoView rongRTCVideoView;
 
-                rongRTCVideoView = mFlRemoteUser.findViewWithTag((Object) MeetVideoView.class.getName());
+                rongRTCVideoView = mFlRemoteUser.findViewWithTag(MeetVideoView.class.getName());
                 // 远端用户离开时, videoview 在 mFlRemoteUser上，删除挂载在 mFlRemoteUser 上的 videoview
                 if (null != rongRTCVideoView) {
                     mFlRemoteUser.removeAllViews();
-                    rongRTCVideoView = mFlFull.findViewWithTag((Object) MeetVideoView.class.getName());
+                    rongRTCVideoView = mFlFull.findViewWithTag(MeetVideoView.class.getName());
                     // 远端用户离开时，如果本地预览正处于全屏状态自动退出全屏
                     if (rongRTCVideoView != null) {
                         mFlFull.removeAllViews();
@@ -266,5 +245,16 @@ public class MeetingActivity extends AppCompatActivity implements MeetingPresent
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * 继承RCRTCVideoView,可以重写RCRTCVideoView方法定制特殊需求，
+     * 例如本例中重写onTouchEvent实现点击全屏
+     */
+    class MeetVideoView extends RCRTCVideoView {
+        public MeetVideoView(Context context) {
+            super(context);
+            this.setTag(MeetVideoView.class.getName());
+        }
     }
 }

@@ -15,9 +15,9 @@
 
     <application>
         <activity
-            android:theme="@style/Theme.Rtcquickdemoandroid"
             android:name="cn.rongcloud.callkit.activity.CallKitActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Rtcquickdemoandroid" />
     </application>
 
 </manifest>

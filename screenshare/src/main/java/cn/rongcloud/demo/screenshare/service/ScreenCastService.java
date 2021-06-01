@@ -34,10 +34,6 @@ public class ScreenCastService extends Service {
         return myBinder;
     }
 
-    private class MyBinder extends Binder {
-
-    }
-
     @RequiresApi(api = VERSION_CODES.O)
     private void createNotificationChannel() {
         Notification.Builder builder = new Notification.Builder(this.getApplicationContext());
@@ -68,5 +64,9 @@ public class ScreenCastService extends Service {
         Log.i(TAG, "----onDestroy----");
         stopForeground(true);
         super.onDestroy();
+    }
+
+    private class MyBinder extends Binder {
+
     }
 }

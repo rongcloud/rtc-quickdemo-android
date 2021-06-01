@@ -23,11 +23,11 @@ import cn.rongcloud.rtc.api.stream.RCRTCVideoOutputStream;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class ScreenShareUtil implements RCRTCSurfaceTextureHelper.Sink {
-    private MediaProjection mMediaProjection;
     private static final int VIRTUAL_DISPLAY_DPI = 400;
     private static final int DISPLAY_FLAGS =
             DisplayManager.VIRTUAL_DISPLAY_FLAG_PUBLIC
                     | DisplayManager.VIRTUAL_DISPLAY_FLAG_PRESENTATION;
+    private MediaProjection mMediaProjection;
     private IRCRTCVideoSource.IRCVideoConsumer videoConsumer;
     private VirtualDisplay mVirtualDisplay;
     private RCRTCVideoOutputStream videoOutputStream;

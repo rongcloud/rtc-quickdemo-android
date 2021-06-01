@@ -6,24 +6,22 @@ import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 
+import androidx.annotation.RequiresApi;
+
 import com.serenegiant.usb.USBMonitor;
 import com.serenegiant.usb.UVCCamera;
 
-import androidx.annotation.RequiresApi;
 import cn.rongcloud.rtc.api.stream.RCRTCSurfaceTextureHelper;
 
-public class UsbCameraHelper implements  RCRTCSurfaceTextureHelper.Sink{
+public class UsbCameraHelper implements RCRTCSurfaceTextureHelper.Sink {
 
+    protected Handler mWorkerHandler;
     String tag = "UsbCameraHelper";
     Context context;
-    private USBMonitor mUSBMonitor;
-    private UVCCamera mUVCCamera;
-    protected Handler mWorkerHandler;
-    private int mWidth = 480;
-    private int mHeight = 640;
     CameraHelperCallBack cameraHelperCallBack;
     RCRTCSurfaceTextureHelper surfaceTextureHelper;
-
+    private USBMonitor mUSBMonitor;
+    private UVCCamera mUVCCamera;
     private final USBMonitor.OnDeviceConnectListener mOnDeviceConnectListener = new USBMonitor.OnDeviceConnectListener() {
         @Override
         public void onAttach(final UsbDevice device) {
@@ -87,29 +85,8 @@ public class UsbCameraHelper implements  RCRTCSurfaceTextureHelper.Sink{
             Log.d("usb", "usb onCancel");
         }
     };
-
-    @Override
-    public void onTexture(int width, int height, int oesTextureId, float[] transformMatrix,
-                          int rotation, long timestamp) {
-        if (null != cameraHelperCallBack) {
-            cameraHelperCallBack.onTexture(width, height, oesTextureId, transformMatrix, rotation, timestamp, mWorkerHandler);
-        }
-    }
-    public interface CameraHelperCallBack {
-        public void onAttach(final UsbDevice device);
-
-        public void onConnect(final UsbDevice device, final USBMonitor.UsbControlBlock ctrlBlock, final boolean createNew);
-
-        public void onDisconnect(final UsbDevice device, final USBMonitor.UsbControlBlock ctrlBlock);
-
-        public void onDettach(final UsbDevice device);
-
-        public void onTexture(final int textureWidth, final int textureHeight, int oexTextureId, float[] transformMatrix, int rotation, long timestampNs, Handler handler);
-    }
-
-    public void release() {
-        mUSBMonitor.destroy();
-    }
+    private int mWidth = 480;
+    private int mHeight = 640;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public UsbCameraHelper(Context context, RCRTCSurfaceTextureHelper helper, CameraHelperCallBack callBack) {
@@ -123,5 +100,29 @@ public class UsbCameraHelper implements  RCRTCSurfaceTextureHelper.Sink{
         mUSBMonitor.register();
         Log.d("usb", "usb onregister  tid " + Thread.currentThread().getId());
 
+    }
+
+    @Override
+    public void onTexture(int width, int height, int oesTextureId, float[] transformMatrix,
+                          int rotation, long timestamp) {
+        if (null != cameraHelperCallBack) {
+            cameraHelperCallBack.onTexture(width, height, oesTextureId, transformMatrix, rotation, timestamp, mWorkerHandler);
+        }
+    }
+
+    public void release() {
+        mUSBMonitor.destroy();
+    }
+
+    public interface CameraHelperCallBack {
+        public void onAttach(final UsbDevice device);
+
+        public void onConnect(final UsbDevice device, final USBMonitor.UsbControlBlock ctrlBlock, final boolean createNew);
+
+        public void onDisconnect(final UsbDevice device, final USBMonitor.UsbControlBlock ctrlBlock);
+
+        public void onDettach(final UsbDevice device);
+
+        public void onTexture(final int textureWidth, final int textureHeight, int oexTextureId, float[] transformMatrix, int rotation, long timestampNs, Handler handler);
     }
 }

@@ -15,13 +15,6 @@ import java.util.Random;
 
 public class MockAppServer {
 
-    public interface GetTokenCallback {
-
-        void onGetTokenSuccess(String token);
-
-        void onGetTokenFailed(String err);
-    }
-
     private static final String TOKEN_SERVER = "https://api-cn.ronghub.com";
 
     public static void getToken(final String appKey, final String appSecret, final String userId, final GetTokenCallback callback) {
@@ -123,5 +116,12 @@ public class MockAppServer {
         md.update(text.getBytes(StandardCharsets.ISO_8859_1), 0, text.length());
         byte[] sha1hash = md.digest();
         return convertToHex(sha1hash);
+    }
+
+    public interface GetTokenCallback {
+
+        void onGetTokenSuccess(String token);
+
+        void onGetTokenFailed(String err);
     }
 }

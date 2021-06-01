@@ -30,7 +30,8 @@
     <FrameLayout
         android:id="@+id/fl_fullscreen"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
+
     <Button
         android:id="@+id/btn_leave"
         android:layout_width="60dp"

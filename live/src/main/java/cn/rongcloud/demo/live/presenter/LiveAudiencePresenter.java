@@ -26,32 +26,87 @@ import cn.rongcloud.rtc.base.RTCErrorCode;
  */
 public class LiveAudiencePresenter extends LiveBasePresenter {
 
-    private RCRTCRoom mRtcRoom = null;
     LiveCallback mLiveCallback = null;
+    private RCRTCRoom mRtcRoom = null;
+    private IRCRTCRoomEventsListener roomEventsListener = new IRCRTCRoomEventsListener() {
+
+        /**
+         * 房间内用户发布资源
+         *
+         * @param rcrtcRemoteUser 远端用户
+         * @param list    发布的资源
+         */
+        @Override
+        public void onRemoteUserPublishResource(RCRTCRemoteUser rcrtcRemoteUser, final List<RCRTCInputStream> list) {
+        }
+
+        @Override
+        public void onRemoteUserMuteAudio(RCRTCRemoteUser rcrtcRemoteUser, RCRTCInputStream rcrtcInputStream, boolean b) {
+        }
+
+        @Override
+        public void onRemoteUserMuteVideo(RCRTCRemoteUser rcrtcRemoteUser, RCRTCInputStream rcrtcInputStream, boolean b) {
+        }
+
+        @Override
+        public void onRemoteUserUnpublishResource(RCRTCRemoteUser rcrtcRemoteUser, List<RCRTCInputStream> list) {
+        }
+
+        /**
+         * 用户加入房间
+         * @param rcrtcRemoteUser 远端用户
+         */
+        @Override
+        public void onUserJoined(final RCRTCRemoteUser rcrtcRemoteUser) {
+            try {
+                getView().onUserJoined(rcrtcRemoteUser);
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        /**
+         * 用户离开房间
+         * @param rcrtcRemoteUser 远端用户
+         */
+        @Override
+        public void onUserLeft(RCRTCRemoteUser rcrtcRemoteUser) {
+            try {
+                getView().onUserLeft(rcrtcRemoteUser);
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onUserOffline(RCRTCRemoteUser rcrtcRemoteUser) {
+        }
+
+        @Override
+        public void onPublishLiveStreams(List<RCRTCInputStream> list) {
+            try {
+                getView().onPublishLiveStreams(list);
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onUnpublishLiveStreams(List<RCRTCInputStream> list) {
+        }
+
+        /**
+         * 自己退出房间。 例如断网退出等
+         * @param i 状态码
+         */
+        @Override
+        public void onLeaveRoom(int i) {
+        }
+    };
 
     public LiveAudiencePresenter(Context context) {
         super(context);
-    }
-
-    /**
-     * 封装对 UI 层的回调，IRCRTCRoomEventsListener 提供了的更多的回调能力，根据业务需求添加监听
-     */
-    public interface LiveCallback {
-        void onJoinRoomSuccess(RCRTCRoom rcrtcRoom);
-
-        void onJoinRoomFailed(RTCErrorCode rtcErrorCode);
-
-        void onSubscribeSuccess(List<RCRTCInputStream> inputStreamList);
-
-        void onSubscribeFailed();
-
-        void onPublishLiveStreams(List<RCRTCInputStream> list);
-
-        void onRemoteUserPublishResource(RCRTCRemoteUser rcrtcRemoteUser, final List<RCRTCInputStream> list);
-
-        void onUserJoined(RCRTCRemoteUser rcrtcRemoteUser);
-
-        void onUserLeft(RCRTCRemoteUser rcrtcRemoteUser);
     }
 
     protected LiveCallback getView() {
@@ -140,83 +195,6 @@ public class LiveAudiencePresenter extends LiveBasePresenter {
         });
     }
 
-    private IRCRTCRoomEventsListener roomEventsListener = new IRCRTCRoomEventsListener() {
-
-        /**
-         * 房间内用户发布资源
-         *
-         * @param rcrtcRemoteUser 远端用户
-         * @param list    发布的资源
-         */
-        @Override
-        public void onRemoteUserPublishResource(RCRTCRemoteUser rcrtcRemoteUser, final List<RCRTCInputStream> list) {
-        }
-
-        @Override
-        public void onRemoteUserMuteAudio(RCRTCRemoteUser rcrtcRemoteUser, RCRTCInputStream rcrtcInputStream, boolean b) {
-        }
-
-        @Override
-        public void onRemoteUserMuteVideo(RCRTCRemoteUser rcrtcRemoteUser, RCRTCInputStream rcrtcInputStream, boolean b) {
-        }
-
-        @Override
-        public void onRemoteUserUnpublishResource(RCRTCRemoteUser rcrtcRemoteUser, List<RCRTCInputStream> list) {
-        }
-
-        /**
-         * 用户加入房间
-         * @param rcrtcRemoteUser 远端用户
-         */
-        @Override
-        public void onUserJoined(final RCRTCRemoteUser rcrtcRemoteUser) {
-            try {
-                getView().onUserJoined(rcrtcRemoteUser);
-            } catch (IllegalStateException e) {
-                e.printStackTrace();
-            }
-
-        }
-
-        /**
-         * 用户离开房间
-         * @param rcrtcRemoteUser 远端用户
-         */
-        @Override
-        public void onUserLeft(RCRTCRemoteUser rcrtcRemoteUser) {
-            try {
-                getView().onUserLeft(rcrtcRemoteUser);
-            } catch (IllegalStateException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void onUserOffline(RCRTCRemoteUser rcrtcRemoteUser) {
-        }
-
-        @Override
-        public void onPublishLiveStreams(List<RCRTCInputStream> list) {
-            try {
-                getView().onPublishLiveStreams(list);
-            } catch (IllegalStateException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void onUnpublishLiveStreams(List<RCRTCInputStream> list) {
-        }
-
-        /**
-         * 自己退出房间。 例如断网退出等
-         * @param i 状态码
-         */
-        @Override
-        public void onLeaveRoom(int i) {
-        }
-    };
-
     public void leaveRoom() {
         if (null != mRtcRoom)
             mRtcRoom.unregisterRoomListener();
@@ -229,5 +207,26 @@ public class LiveAudiencePresenter extends LiveBasePresenter {
             public void onSuccess() {
             }
         });
+    }
+
+    /**
+     * 封装对 UI 层的回调，IRCRTCRoomEventsListener 提供了的更多的回调能力，根据业务需求添加监听
+     */
+    public interface LiveCallback {
+        void onJoinRoomSuccess(RCRTCRoom rcrtcRoom);
+
+        void onJoinRoomFailed(RTCErrorCode rtcErrorCode);
+
+        void onSubscribeSuccess(List<RCRTCInputStream> inputStreamList);
+
+        void onSubscribeFailed();
+
+        void onPublishLiveStreams(List<RCRTCInputStream> list);
+
+        void onRemoteUserPublishResource(RCRTCRemoteUser rcrtcRemoteUser, final List<RCRTCInputStream> list);
+
+        void onUserJoined(RCRTCRemoteUser rcrtcRemoteUser);
+
+        void onUserLeft(RCRTCRemoteUser rcrtcRemoteUser);
     }
 }
