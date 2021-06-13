@@ -28,27 +28,23 @@ public class LiveRouteActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_route_room);
-
-        mEditRoomId = (EditText) findViewById(R.id.et_roomid);
+        mEditRoomId = findViewById(R.id.et_room_id);
     }
 
     public void click(View view) {
-        int type = 0;
-        if (view.getId() == R.id.btn_startlive) {
+        if (view.getId() == R.id.btn_start_live) {
             String roomId = mEditRoomId.getText().toString().trim();
             if (TextUtils.isEmpty(roomId)) {
-                Toast.makeText(this, "请输入直播房间号", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "请输入直播房间 ID", Toast.LENGTH_SHORT).show();
                 return;
             }
-
             LiveActivity.start(this, roomId, RCRTCLiveRole.BROADCASTER.getType());
-        } else if (view.getId() == R.id.btn_joinlive) {
+        } else if (view.getId() == R.id.btn_join_live) {
             String roomId = mEditRoomId.getText().toString().trim();
             if (TextUtils.isEmpty(roomId)) {
-                Toast.makeText(this, "请输入直播房间号", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "请输入直播房间 ID", Toast.LENGTH_SHORT).show();
                 return;
             }
-
             LiveActivity.start(this, roomId, RCRTCLiveRole.AUDIENCE.getType());
         }
     }

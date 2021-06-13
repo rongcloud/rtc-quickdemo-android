@@ -15,27 +15,27 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/tv_inputroomid"
+        android:id="@+id/tv_room_id"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="30dp"
+        android:layout_height="25dp"
+        android:layout_marginStart="30dp"
         android:layout_marginTop="60dp"
-        android:text="请输入房间号："
+        android:layout_marginEnd="30dp"
+        android:text="请输入直播房间 ID："
         android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_live" />
 
     <EditText
-        android:id="@+id/et_roomid"
+        android:id="@+id/et_room_id"
         android:layout_width="0dp"
         android:layout_height="40dp"
         android:layout_marginLeft="30dp"
         android:layout_marginTop="30dp"
         android:layout_marginRight="30dp"
         android:background="@color/white"
-        android:hint="请输入"
-        android:inputType="number"
-        android:maxLength="11"
+        android:maxLength="16"
         android:maxLines="1"
         android:singleLine="true"
         android:textColor="@color/black"
@@ -43,7 +43,7 @@
         android:textSize="16sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_inputroomid" />
+        app:layout_constraintTop_toBottomOf="@id/tv_room_id" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -54,26 +54,28 @@
         android:orientation="horizontal"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/et_roomid">
+        app:layout_constraintTop_toBottomOf="@id/et_room_id">
 
         <Button
-            android:id="@+id/btn_startlive"
+            android:id="@+id/btn_start_live"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginRight="20dp"
+            android:layout_marginEnd="20dp"
             android:layout_weight="1"
-            android:background="#57B5F9"
+            android:background="@drawable/btn_style"
             android:onClick="click"
             android:text="开始直播"
             android:textColor="@color/white"
             android:textSize="16sp" />
 
         <Button
-            android:id="@+id/btn_joinlive"
+            android:id="@+id/btn_join_live"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#57B5F9"
+            android:background="@drawable/btn_style"
             android:onClick="click"
             android:text="加入直播"
             android:textColor="@color/white"

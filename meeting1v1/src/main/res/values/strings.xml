@@ -1,5 +1,0 @@
-<resources>
-    <string name="textview_room_number">房间号</string>
-    <string name="edittext_room_id">请输入房间号</string>
-    <string name="button_joinroom">进入房间</string>
-</resources>

@@ -72,7 +72,7 @@
         android:layout_marginLeft="30dp"
         android:layout_marginTop="40dp"
         android:layout_marginRight="30dp"
-        android:background="#57B5F9"
+        android:background="@drawable/btn_style"
         android:onClick="onLoginButtonClicked"
         android:text="连接 IM 服务"
         android:textColor="@color/white"

@@ -30,7 +30,7 @@ import cn.rongcloud.rtc.base.RCRTCMediaType;
 import cn.rongcloud.rtc.base.RTCErrorCode;
 
 /**
- * RTC QuickDemo 1v1 视频会议
+ * 1v1 视频会议演示
  */
 public class MeetingActivity extends AppCompatActivity implements MeetingPresenter.MeetingCallback {
 
@@ -39,13 +39,13 @@ public class MeetingActivity extends AppCompatActivity implements MeetingPresent
     private static String mRoomId = "";
 
     static {
-        // 加载加密所使用的 so 库
+        // 自定义加密功能所需 so 库
         System.loadLibrary("custom_frame_crypto");
     }
 
     MeetingPresenter mMeetingPresenter;
     private boolean isEncryption = false;
-    //本地预览远端用户，全屏显示 videoview
+    // 本地预览远端用户，全屏显示 VideoView
     private FrameLayout mFlLocalUser, mFlRemoteUser, mFlFull;
 
     public static void start(Context context, String roomId, boolean isEncryption) {
@@ -78,7 +78,7 @@ public class MeetingActivity extends AppCompatActivity implements MeetingPresent
     private void initTitle() {
         ActionBar supportActionBar = getSupportActionBar();
         if (supportActionBar != null) {
-            supportActionBar.setTitle((isEncryption ? "加密会议" : "非加密会议") + ":" + mRoomId);
+            supportActionBar.setTitle((isEncryption ? "加密会议" : "普通会议") + ":" + mRoomId);
         }
     }
 
@@ -110,7 +110,7 @@ public class MeetingActivity extends AppCompatActivity implements MeetingPresent
 
     @Override
     public void onJoinRoomSuccess(RCRTCRoom rcrtcRoom) {
-        // 加入房间成功，设置本地用户显示的view，ui线程执行
+        // 加入房间成功，在 UI 线程设置本地用户显示的 View
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -136,12 +136,10 @@ public class MeetingActivity extends AppCompatActivity implements MeetingPresent
                 };
                 RCRTCEngine.getInstance().getDefaultVideoStream().setVideoView(rongRTCVideoView);
                 mFlLocalUser.addView(rongRTCVideoView);
-
                 // 本地用户发布
                 mMeetingPresenter.publishDefaultAVStream();
                 // 主动订阅远端用户发布的资源
                 mMeetingPresenter.subscribeAVStream();
-
             }
         });
     }
@@ -167,19 +165,15 @@ public class MeetingActivity extends AppCompatActivity implements MeetingPresent
                 RCRTCVideoView videoView = new MeetVideoView(getApplicationContext()) {
                     public boolean onTouchEvent(MotionEvent event) {
                         super.onTouchEvent(event);
-                        switch (event.getAction()) {
-                            // 远端用户视频全屏切换
-                            case MotionEvent.ACTION_DOWN:
-                                if (this.getParent() == mFlRemoteUser) {
-                                    mFlRemoteUser.removeView(this);
-                                    mFlFull.addView(this);
-                                } else {
-                                    mFlFull.removeView(this);
-                                    mFlRemoteUser.addView(this);
-                                }
-                                break;
-                            default:
-                                break;
+                        // 远端用户视频全屏切换
+                        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                            if (this.getParent() == mFlRemoteUser) {
+                                mFlRemoteUser.removeView(this);
+                                mFlFull.addView(this);
+                            } else {
+                                mFlFull.removeView(this);
+                                mFlRemoteUser.addView(this);
+                            }
                         }
                         return true;
                     }
@@ -199,7 +193,6 @@ public class MeetingActivity extends AppCompatActivity implements MeetingPresent
 
     @Override
     public void onSubscribeFailed() {
-
     }
 
     @Override
@@ -217,9 +210,7 @@ public class MeetingActivity extends AppCompatActivity implements MeetingPresent
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                RCRTCVideoView rongRTCVideoView;
-
-                rongRTCVideoView = mFlRemoteUser.findViewWithTag(MeetVideoView.class.getName());
+                RCRTCVideoView rongRTCVideoView = mFlRemoteUser.findViewWithTag(MeetVideoView.class.getName());
                 // 远端用户离开时, videoview 在 mFlRemoteUser上，删除挂载在 mFlRemoteUser 上的 videoview
                 if (null != rongRTCVideoView) {
                     mFlRemoteUser.removeAllViews();

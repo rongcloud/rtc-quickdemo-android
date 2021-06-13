@@ -27,11 +27,11 @@ import cn.rongcloud.demo.common.UiUtils;
 import io.rong.imlib.RongIMClient;
 
 /**
- * RTC QuickDemo 登录页
+ * 登录页
  */
 public class LoginActivity extends AppCompatActivity {
 
-    private static final String TAG = "LoginActivity";
+    private static final String TAG = LoginActivity.class.getName();
     private EditText mEditUserId;
 
     @Override
@@ -111,8 +111,8 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    // 使用从 App Server 获取的代表 UserID 身份的 Token 字符串，连接融云 IM 服务。
     private void connectIMServer(String token) {
+        // 关键步骤 2：使用从 App Server 获取的代表 UserID 身份的 Token 字符串，连接融云 IM 服务。
         RongIMClient.connect(token, new RongIMClient.ConnectCallback() {
             @Override
             public void onSuccess(String s) {
@@ -130,6 +130,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onDatabaseOpened(RongIMClient.DatabaseOpenStatus databaseOpenStatus) {
+                Log.d(TAG, "onDatabaseOpened");
             }
         });
     }

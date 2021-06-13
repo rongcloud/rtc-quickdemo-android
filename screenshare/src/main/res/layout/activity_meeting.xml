@@ -40,5 +40,4 @@
         app:layout_constraintStart_toEndOf="@+id/iv_hangup"
         app:srcCompat="@drawable/ic_ear_monitoring" />
 
-
 </androidx.constraintlayout.widget.ConstraintLayout>

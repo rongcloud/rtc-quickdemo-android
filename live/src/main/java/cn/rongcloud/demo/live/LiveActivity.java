@@ -47,7 +47,7 @@ import cn.rongcloud.rtc.base.RCRTCVideoFrame;
 import cn.rongcloud.rtc.base.RTCErrorCode;
 
 /**
- * RTC QuickDemo 直播功能activity
+ * 直播演示
  */
 public class LiveActivity extends AppCompatActivity {
 
@@ -78,7 +78,7 @@ public class LiveActivity extends AppCompatActivity {
     IStatus BakStatus;
     FrameLayout flSurfaceContainer;
     VideoViewManager videoViewManager;
-    Button mMixlayout;
+    Button mMixLayout;
     IStatus mIdleStatus = new IdleStatus();
     IStatus mAnchorStatus = new AnchorStatus();
     IStatus mAudienceStatus = new AudienceStatus();
@@ -116,7 +116,7 @@ public class LiveActivity extends AppCompatActivity {
         mMic.setVisibility(View.INVISIBLE);
         mSwitch.setVisibility(View.INVISIBLE);
         mEndLive.setVisibility(View.INVISIBLE);
-        mMixlayout.setVisibility(View.INVISIBLE);
+        mMixLayout.setVisibility(View.INVISIBLE);
 
         curStatus = mIdleStatus;
     }
@@ -178,7 +178,7 @@ public class LiveActivity extends AppCompatActivity {
         mMic = findViewById(R.id.bu_mic);
         mSwitch = findViewById(R.id.bu_switchcrame);
         mEndLive = findViewById(R.id.bu_endlive);
-        mMixlayout = findViewById(R.id.bu_layout);
+        mMixLayout = findViewById(R.id.bu_layout);
 
         flSurfaceContainer = findViewById(R.id.surfcecontainer);
         flSurfaceContainer.post(new Runnable() {
@@ -596,7 +596,7 @@ public class LiveActivity extends AppCompatActivity {
             mMic.setVisibility(View.VISIBLE);
             mSwitch.setVisibility(View.VISIBLE);
             mEndLive.setVisibility(View.VISIBLE);
-            mMixlayout.setVisibility(View.VISIBLE);
+            mMixLayout.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -735,7 +735,7 @@ public class LiveActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mMixlayout.setText(s);
+                    mMixLayout.setText(s);
                 }
             });
         }
@@ -936,7 +936,7 @@ public class LiveActivity extends AppCompatActivity {
             mMic.setVisibility(View.INVISIBLE);
             mSwitch.setVisibility(View.INVISIBLE);
             mEndLive.setVisibility(View.INVISIBLE);
-            mMixlayout.setVisibility(View.INVISIBLE);
+            mMixLayout.setVisibility(View.INVISIBLE);
         }
 
         @Override
