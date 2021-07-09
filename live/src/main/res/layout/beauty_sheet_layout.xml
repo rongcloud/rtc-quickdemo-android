@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/beauty_sheet_bg"
+    android:layout_height="wrap_content">
+
+    <FrameLayout
+        android:id="@+id/fl_beauty_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layerType="software"
+        android:background="@drawable/beauty_sheet_line_bg"/>
+    <RadioGroup
+        android:id="@+id/rg_beauty"
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:weightSum="4"
+        android:layout_marginBottom="5dp"
+        android:layout_height="wrap_content">
+
+        <RadioButton
+            android:id="@+id/beauty_filter"
+            android:text="滤镜"
+            android:layout_marginLeft="10dp"
+            android:drawablePadding="0dp"
+            android:textColor="@drawable/beauty_sheet_item_txt_bg"
+            style="@style/style_beauty_sheet_item" />
+        <View
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:layout_height="1dp"/>
+        <RadioButton
+            android:id="@+id/beauty_whiteness"
+            android:text="美白"
+            android:drawablePadding="0dp"
+            android:textColor="@drawable/beauty_sheet_whiteness_bg"
+            style="@style/style_beauty_sheet_item"/>
+        <View
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:layout_height="1dp"/>
+        <RadioButton
+            android:id="@+id/beauty_ruddy"
+            android:text="红润"
+            android:drawablePadding="0dp"
+            android:textColor="@drawable/beauty_sheet_item_txt_bg"
+            style="@style/style_beauty_sheet_item"/>
+        <View
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:layout_height="1dp"/>
+        <RadioButton
+            android:id="@+id/beauty_smooth"
+            android:text="磨皮"
+            android:textColor="@drawable/beauty_sheet_item_txt_bg"
+            style="@style/style_beauty_sheet_item"/>
+        <View
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:layout_height="1dp"/>
+        <RadioButton
+            android:id="@+id/beauty_bright"
+            android:text="亮度"
+            android:layout_marginRight="10dp"
+            android:textColor="@drawable/beauty_sheet_item_txt_bg"
+            style="@style/style_beauty_sheet_item"/>
+    </RadioGroup>
+
+</LinearLayout>

@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="cn.rongcloud.demo.live">
 
     <uses-feature android:name="android.hardware.usb.host" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <application>
         <activity
-            android:name="cn.rongcloud.demo.live.LiveActivity"
+            android:name=".LiveActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light" />
         <activity
-            android:name="cn.rongcloud.demo.live.LiveRouteActivity"
+            android:name=".LiveRouteActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />

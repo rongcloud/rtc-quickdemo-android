@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:id="@android:id/background">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/gray_lighter"/>
+            <corners android:radius="@dimen/live_room_action_sheet_seek_bar_radius"/>
+        </shape>
+    </item>
+    <item android:id="@android:id/progress">
+        <selector>
+            <item android:state_enabled="true">
+                <clip>
+                    <shape android:shape="rectangle">
+                        <solid android:color="@color/blue_0"/>
+                        <corners android:radius="@dimen/live_room_action_sheet_seek_bar_radius"/>
+                    </shape>
+                </clip>
+            </item>
+            <item android:state_enabled="false">
+                <clip>
+                    <shape android:shape="rectangle">
+                        <solid android:color="@color/gray_lighter"/>
+                        <corners android:radius="@dimen/live_room_action_sheet_seek_bar_radius"/>
+                    </shape>
+                </clip>
+            </item>
+        </selector>
+
+    </item>
+</layer-list>

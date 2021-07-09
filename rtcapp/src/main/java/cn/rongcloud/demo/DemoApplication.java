@@ -13,14 +13,14 @@ public class DemoApplication extends Application {
     /**
      * TODO: 请替换成您自己申请的 AppKey
      */
-    public static final String APP_KEY = ;
+    public static final String APP_KEY = // 类似 "n19jmcy59ocx0";
 
     /**
      * TODO: 请替换成您自己 AppKey 对应的 Secret
      * 这里仅用于模拟从 App Server 获取 UserID 对应的 Token, 开发者在上线应用时客户端代码不要存储该 Secret，
      * 否则有被用户反编译获取的风险，拥有 Secret 可以向融云 Server 请求高级权限操作，对应用安全造成恶劣影响。
      */
-    public static final String APP_SECRET = ;
+    public static final String APP_SECRET = // 类似 "hccSLZPPmu";
 
     @Override
     public void onCreate() {

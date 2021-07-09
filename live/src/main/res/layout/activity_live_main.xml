@@ -92,11 +92,21 @@
                 android:id="@+id/bu_requestlive"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
+                android:layout_marginRight="20dp"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
                 android:background="#57B5F9"
                 android:onClick="click"
                 android:text="上麦" />
+            <Button
+                android:id="@+id/bu_beauty"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:background="#57B5F9"
+                android:onClick="click"
+                android:text="美颜" />
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

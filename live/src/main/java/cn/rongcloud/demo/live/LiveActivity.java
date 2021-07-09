@@ -27,11 +27,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.rongcloud.beauty.RCRTCBeautyEngine;
 import cn.rongcloud.demo.live.gpuimage.GPUImageBeautyFilter;
 import cn.rongcloud.demo.live.gpuimage.GPUImageFilter;
 import cn.rongcloud.demo.live.presenter.LiveAnchorPresenter;
 import cn.rongcloud.demo.live.presenter.LiveAudiencePresenter;
 import cn.rongcloud.demo.live.status.IStatus;
+import cn.rongcloud.demo.live.ui.BeautySheetDialog;
 import cn.rongcloud.demo.live.ui.VideoViewManager;
 import cn.rongcloud.rtc.api.RCRTCEngine;
 import cn.rongcloud.rtc.api.RCRTCRemoteUser;
@@ -87,7 +89,9 @@ public class LiveActivity extends AppCompatActivity {
     private Button mMic;
     private Button mSwitch;
     private Button mEndLive;
+    private Button beautyBtn;
     private MenuItem mBeautyMenuItem;
+    private BeautySheetDialog beautySheetDialog;
     // 美颜开关状态
     private volatile boolean mBeautyStatus = false;
     private VideoFilterHandler mVideoFilterHandler = null;
@@ -112,6 +116,7 @@ public class LiveActivity extends AppCompatActivity {
      */
     void setIdleStatus() {
         mRequestLive.setVisibility(View.INVISIBLE);
+	    beautyBtn.setVisibility(View.VISIBLE);
         mCamera.setVisibility(View.INVISIBLE);
         mMic.setVisibility(View.INVISIBLE);
         mSwitch.setVisibility(View.INVISIBLE);
@@ -150,6 +155,7 @@ public class LiveActivity extends AppCompatActivity {
     void setAnchorStatus() {
         if (null != curStatus) {
             curStatus.detach();
+            RCRTCBeautyEngine.getInstance().reset();
             BakStatus = curStatus;
             // 恢复到 idle 状态
             setIdleStatus();
@@ -176,6 +182,7 @@ public class LiveActivity extends AppCompatActivity {
         mRequestLive = findViewById(R.id.bu_requestlive);
         mCamera = findViewById(R.id.bu_camera);
         mMic = findViewById(R.id.bu_mic);
+	    beautyBtn = findViewById(R.id.bu_beauty);
         mSwitch = findViewById(R.id.bu_switchcrame);
         mEndLive = findViewById(R.id.bu_endlive);
         mMixLayout = findViewById(R.id.bu_layout);
@@ -262,6 +269,8 @@ public class LiveActivity extends AppCompatActivity {
         } else if (view.getId() == R.id.bu_layout) {
             String str = ((Button) view).getText().toString();
             setMixLayout(str);
+        }else if (view.getId() == R.id.bu_beauty){
+            showBeautyDialog();
         }
     }
 
@@ -307,11 +316,29 @@ public class LiveActivity extends AppCompatActivity {
      * @param beautyStatus
      */
     private void handleBeautyStatusChange(boolean beautyStatus) {
-        if (mBeautyMenuItem != null) {
+
+	if (mBeautyMenuItem != null) {
             mBeautyStatus = beautyStatus;
+            if (mBeautyStatus){
+                beautyBtn.setEnabled(true);
+                showBeautyDialog();
+            }else {
+                beautyBtn.setEnabled(false);
+                RCRTCBeautyEngine.getInstance().reset();
+            }
             mBeautyMenuItem.setTitle(mBeautyStatus ? "关闭美颜" : "打开美颜");
         }
     }
+
+    private void showBeautyDialog(){
+        if (beautySheetDialog == null){
+            beautySheetDialog = new BeautySheetDialog(this);
+        }
+        if (!beautySheetDialog.isShowing()){
+            beautySheetDialog.show();
+        }
+    }
+
 
     private void handleMenuUsbStreamStatus(PushFileStreamStatus status) {
         if (mMenuUsbStreamItem != null) {
@@ -663,7 +690,7 @@ public class LiveActivity extends AppCompatActivity {
                     RCRTCEngine.getInstance().getDefaultVideoStream().setVideoFrameListener(new IRCRTCVideoOutputFrameListener() {
                         @Override
                         public RCRTCVideoFrame processVideoFrame(RCRTCVideoFrame rcrtcVideoFrame) {
-                            if (mBeautyStatus) {
+                            if (mBeautyStatus && false) {   // 默认是使用自定义美颜. 使用plugin形式的美颜
                                 try {
                                     if (mVideoFilterHandler == null) {
                                         //通过当前线程的Looper创建Handler，确保OpenGL的资源创建销毁都在当前线程
@@ -932,6 +959,7 @@ public class LiveActivity extends AppCompatActivity {
         @Override
         public void changeUi() {
             mRequestLive.setVisibility(View.VISIBLE);
+            beautyBtn.setVisibility(View.GONE);
             mCamera.setVisibility(View.INVISIBLE);
             mMic.setVisibility(View.INVISIBLE);
             mSwitch.setVisibility(View.INVISIBLE);
