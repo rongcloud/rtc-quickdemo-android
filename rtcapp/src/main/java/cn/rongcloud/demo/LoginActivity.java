@@ -106,7 +106,12 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onGetTokenFailed(String code) {
                 UiUtils.hideWaitingDialog();
-                Toast.makeText(LoginActivity.this, "获取 Token 失败，code = " + code, Toast.LENGTH_SHORT).show();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(LoginActivity.this, "获取 Token 失败，code = " + code, Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
     }

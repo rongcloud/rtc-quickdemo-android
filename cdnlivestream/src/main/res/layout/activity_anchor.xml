@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+
+  <FrameLayout
+    android:id="@+id/frameLayout"
+    android:layout_width="match_parent"
+    android:layout_centerInParent="true"
+    android:layout_height="match_parent"/>
+
+  <Button
+    android:id="@+id/btn_leaveRoom"
+    style="?android:attr/buttonBarButtonStyle"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="15dp"
+    android:layout_alignParentRight="true"
+    android:background="@drawable/btn_style"
+    android:onClick="clickAnchor"
+    android:text="关闭"
+    android:textColor="@color/white"
+    android:textSize="16sp" />
+
+  <Button
+    android:id="@+id/btn_enableInnerCDN"
+    style="?android:attr/buttonBarButtonStyle"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="45dp"
+    android:layout_alignParentBottom="true"
+    android:layout_centerInParent="true"
+    android:background="@drawable/btn_style"
+    android:onClick="clickAnchor"
+    android:padding="@dimen/btn_padding_dp"
+    android:text="开始推流到CDN"
+    android:textColor="@color/white"
+    android:textSize="16sp" />
+
+
+  <TextView
+    android:id="@+id/tv_room_id"
+    android:layout_width="wrap_content"
+    android:textColor="@color/black"
+    android:layout_centerHorizontal="true"
+    android:layout_marginTop="5dp"
+    android:textSize="15sp"
+    android:layout_height="wrap_content"/>
+
+</RelativeLayout>

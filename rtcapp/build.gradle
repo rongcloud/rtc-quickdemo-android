@@ -35,6 +35,7 @@ dependencies {
     implementation project(path: ':meeting1v1')
     implementation project(path: ':live')
     implementation project(path: ':screenshare')
+    implementation project(path: ':cdnlivestream')
     implementation rootProject.ext.dependencies.im_lib
 
     implementation 'androidx.appcompat:appcompat:1.1.0'

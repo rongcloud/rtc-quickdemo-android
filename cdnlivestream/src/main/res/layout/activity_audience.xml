@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+
+  <RelativeLayout
+    android:id="@+id/relativeLayout"
+    android:layout_width="match_parent"
+    android:gravity="center"
+    android:layout_height="match_parent"/>
+
+  <Button
+    android:id="@+id/btn_leaveRoom"
+    style="?android:attr/buttonBarButtonStyle"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="15dp"
+    android:layout_alignParentRight="true"
+    android:background="@drawable/btn_style"
+    android:onClick="clickAudience"
+    android:text="关闭"
+    android:textColor="@color/white"
+    android:textSize="16sp" />
+
+  <Button
+    android:id="@+id/btn_refresh"
+    style="?android:attr/buttonBarButtonStyle"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="15dp"
+    android:background="@drawable/btn_style"
+    android:onClick="clickAudience"
+    android:text="刷新"
+    android:textColor="@color/white"
+    android:textSize="16sp" />
+
+
+  <Button
+    android:id="@+id/btn_action"
+    style="?android:attr/buttonBarButtonStyle"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+    android:layout_centerInParent="true"
+    android:padding="10dp"
+    android:layout_marginBottom="45dp"
+    android:background="@drawable/btn_style"
+    android:onClick="clickAudience"
+    android:text="订阅"
+    android:textColor="@color/white"
+    android:textSize="16sp" />
+
+  <Button
+    android:id="@+id/btn_changeVideoSize"
+    style="?android:attr/buttonBarButtonStyle"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentRight="true"
+    android:layout_alignParentBottom="true"
+    android:layout_marginBottom="15dp"
+    android:layout_marginRight="15dp"
+    android:padding="@dimen/btn_padding_dp"
+    android:background="@drawable/btn_style"
+    android:onClick="clickAudience"
+    android:text="切换分辨率"
+    android:textColor="@color/white"
+    android:textSize="13sp" />
+
+  <TextView
+    android:id="@+id/tv_room_id"
+    android:layout_width="wrap_content"
+    android:textColor="@color/black"
+    android:layout_centerHorizontal="true"
+    android:layout_marginTop="5dp"
+    android:textSize="15sp"
+    android:layout_height="wrap_content"/>
+
+</RelativeLayout>

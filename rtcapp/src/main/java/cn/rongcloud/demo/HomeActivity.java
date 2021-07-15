@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import cn.rongcloud.demo.cdn.CDNMainActivity;
 import java.util.Arrays;
 import java.util.List;
 
@@ -63,7 +64,17 @@ public class HomeActivity extends AppCompatActivity {
                                 Toast.makeText(HomeActivity.this, "该功能仅支持 Android 5.0 及以上版本", Toast.LENGTH_SHORT).show();
                             }
                         }
-                    })
+                    }),
+            new HomeListAdapter.HomeListItemModel(3,
+                "CDN直播拉流",
+                "支持主播发布CDN流、观众订阅CDN流",
+                R.drawable.ic_live,
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        CDNMainActivity.start(HomeActivity.this);
+                    }
+                })
     );
     private final HomeListAdapter adapter = new HomeListAdapter(modelList);
 

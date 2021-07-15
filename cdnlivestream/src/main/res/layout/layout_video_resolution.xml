@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="200dp"
+  android:minHeight="260dp"
+  android:background="@color/white"
+  tools:ignore="MissingDefaultResource">
+
+  <RelativeLayout
+    android:id="@+id/relative_title"
+    android:layout_width="match_parent"
+    android:layout_alignParentTop="true"
+    android:layout_height="35dp">
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:text="选择分辨率"
+      android:textColor="@color/black"
+      android:layout_centerInParent="true"
+      android:textSize="16sp"
+      android:layout_height="wrap_content"/>
+
+    <ImageView
+      android:id="@+id/iv_close"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:src="@mipmap/ic_close"
+      android:layout_marginRight="15dp"
+      android:layout_centerVertical="true"
+      android:padding="10dp"
+      android:layout_alignParentRight="true"/>
+
+  </RelativeLayout>
+
+  <View
+    android:layout_width="match_parent"
+    android:layout_below="@+id/relative_title"
+    android:layout_height="1dp"
+    android:background="@color/line"/>
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_marginTop="35dp"
+    android:layout_centerInParent="true"
+    android:layout_height="wrap_content">
+
+    <RadioGroup
+      android:id="@+id/rg_videoResolution"
+      android:layout_width="match_parent"
+      android:orientation="horizontal"
+      android:layout_height="wrap_content">
+
+      <RadioButton
+        android:id="@+id/rb_360_640"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:text="360x640"
+        android:checked="true"
+        android:layout_marginRight="5dp"
+        android:layout_height="wrap_content"/>
+
+      <RadioButton
+        android:id="@+id/rb_720_1280"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:text="720x1280"
+        android:layout_marginRight="5dp"
+        android:layout_height="wrap_content"/>
+
+      <RadioButton
+        android:id="@+id/rb_1080_1920"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:text="1080x1920"
+        android:layout_marginRight="5dp"
+        android:layout_height="wrap_content"/>
+
+    </RadioGroup>
+
+    <Button
+      android:id="@+id/btn_ok"
+      android:layout_below="@+id/rg_videoResolution"
+      style="?android:attr/buttonBarButtonStyle"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="45dp"
+      android:padding="@dimen/btn_padding_dp"
+      android:layout_gravity="center_horizontal"
+      android:layout_centerHorizontal="true"
+      android:background="@drawable/btn_style"
+      android:text="确认切换"
+      android:textColor="@color/white"
+      android:textSize="16sp" />
+
+  </LinearLayout>
+
+</RelativeLayout>
