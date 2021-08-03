@@ -2,6 +2,10 @@
 
 本示例应用演示了[融云实时音视频 Android SDK] 支持的[音视频通话]场景与功能，适用于包含呼叫流程的音视频业务场景。
 
+<p align="center" style="background-color: #e1e5eb; padding: 10px; margin-top: 5px; margin-bottom:5px;">
+<img src="../images/callapp-demo.png" width="20%">
+</p>
+
 如果想要直接下载 Android APK 体验应用功能，欢迎[前往融云官网下载场景的示例应用](https://www.rongcloud.cn/downloads/demo)。
 
 ## 前提条件
