@@ -2,13 +2,13 @@
 
 本代码仓库集合了融云实时音视频产品[音视频通话]、[音视频会议]、[低延迟直播]在 Android 端的示例代码，以便开发者体验产品，快速集成[融云实时音视频 Android 端 SDK]，实现单群聊、音视频通话、语音聊天室、娱乐直播、教学课堂、多人会议等场景需求。
 
-如果想要直接下载 Android APK 体验各场景下应用功能，欢迎[前往融云官网下载个场景的示例应用](https://www.rongcloud.cn/downloads/demo)。
+如果想要直接下载 Android APK 体验各场景下应用功能，欢迎[前往融云官网下载各场景的示例应用](https://www.rongcloud.cn/downloads/demo)。
 
 本仓库包含两个示例应用项目: 
 
 1. [rtcapp](callpp): 集中演示融云实时音视频 Android SDK 支持的多个非呼叫业务场景与功能。
 
-1. [callapp](callapp): 演示融云实时音视频 Android SDK 支持的含呼叫业务音视频通话场景与功能。
+1. [callapp](rtcapp): 演示融云实时音视频 Android SDK 支持的含呼叫业务音视频通话场景与功能。
 
 本仓库还包含多个组件: (module): 
 
