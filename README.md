@@ -11,9 +11,9 @@
 
 本仓库包含两个示例应用项目: 
 
-1. [rtcapp](callpp): 集中演示融云实时音视频 Android SDK 支持的多个非呼叫业务场景与功能。
+1. [rtcapp](rtcapp): 集中演示融云实时音视频 Android SDK 支持的多个非呼叫业务场景与功能。
 
-1. [callapp](rtcapp): 演示融云实时音视频 Android SDK 支持的含呼叫业务音视频通话场景与功能。
+1. [callapp](callapp): 演示融云实时音视频 Android SDK 支持的含呼叫业务音视频通话场景与功能。
 
 本仓库还包含多个组件: (module): 
 
