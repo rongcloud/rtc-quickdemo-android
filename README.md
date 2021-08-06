@@ -26,10 +26,11 @@
 
 ## 前提条件
 
-* 示例应用与组件目录下的 README 分别列出了具体的前提条件。
+* 示例应用与组件目录下的 README 分别列出了具体的前提条件要求。
 * 必须使用 Android Studio。如果您尚未安装，请[下载](https://developer.android.com/studio/index.html)并[安装](https://developer.android.com/studio/install.html?pkg=studio)。
-* 所有示例应用均需要求 
 * 所有示例应用均需要有 App Key 才能换取客户端连接融云服务器的身份凭证。通过开发者后台[获取 App Key]。
+* Android 4.4 或更高版本 (Android API 19 及以上)
+* JDK 1.7 及以上。
 
 ## 设置设备
 
@@ -42,7 +43,7 @@
 
 1. 克隆本存储库下载示例代码。
 1. 在 Android Studio 中，选择 **Open an Existing project**。
-1. 打开克隆下载的代码仓库，等待导入完成。<!-- 考虑：在导入到运行之间，容易出现什么问题，导致体验受阻?-- >
+1. 打开克隆下载的代码仓库，等待导入完成。<!-- 考虑：在导入到运行之间，容易出现什么问题，导致体验受阻? -->
 1. 在示例应用的 `DemoApplication.java` 中，填入从融云开发者获取的 App Key 与 App Secret。
 
     路径：**Project** 视图下 `<demo-app-name>/src/main/cn.rongcloud.demo`。
