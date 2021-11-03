@@ -90,11 +90,11 @@ Demo 源码遵循 MIT 开源协议。
 
 <!-- links to docs -->
 
-[音视频通话文档]: https://docs.rongcloud.cn/v4/5X/views/rtc/call/intro/ability.html
+[音视频通话文档]: http://doc.rongcloud.cn/call/Android/5.X/demo
 
-[音视频会议文档]: https://docs.rongcloud.cn/v4/5X/views/rtc/meeting/ios/intro/intro.html
+[音视频会议文档]: http://doc.rongcloud.cn/meeting/Android/5.X/demo
 
-[低延迟直播文档]: https://docs.rongcloud.cn/v4/5X/views/rtc/livevideo/ios/intro/intro.html
+[低延迟直播文档]: http://doc.rongcloud.cn/live/Android/5.X/demo
 
 <!-- links to ops -->
 
