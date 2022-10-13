@@ -10,17 +10,17 @@ ext {
     dependencies = [
 
             // IM 通信组件，包含 UI，适用于快速集成，对 UI 定制需求交少的开发者，IMKit 依赖 IMLib
-            im_kit  : 'cn.rongcloud.sdk:im_kit:5.2.5'
+            im_kit  : 'cn.rongcloud.sdk:im_kit:5.2.4'
             // IM 通信能力库，不含 UI，适用于对 UI 有较高订制需求的 IM 开发者
-            im_lib  : 'cn.rongcloud.sdk:im_lib:5.2.5'
+            im_lib  : 'cn.rongcloud.sdk:im_lib:5.2.4'
             // 音视频核心引擎，不含 UI、呼叫流程，适用于对 UI 有较高订制需求的音视频开发者，RTCLib 依赖 IMLib
-            rtc_lib : 'cn.rongcloud.sdk:rtc_lib:5.2.5'
+            rtc_lib : 'cn.rongcloud.sdk:rtc_lib:5.2.4'
             // 音视频通话界面组件，包含 UI，适用于快速集成音视频通话，对 UI 定制需求交少的开发者，CallKit 依赖 CallLib、IMKit
-            call_kit: 'cn.rongcloud.sdk:call_kit:5.2.5'
+            call_kit: 'cn.rongcloud.sdk:call_kit:5.2.4'
             // 音视频通话通信库，不含 UI，包含呼叫流程，适用于音视频通话场景，CallLib 依赖 RTCLib、IMLib
-            call_lib: 'cn.rongcloud.sdk:call_lib:5.2.5'
+            call_lib: 'cn.rongcloud.sdk:call_lib:5.2.4'
             //美顏
-            face_beautifier: 'cn.rongcloud.sdk:face_beautifier:5.2.5'
-            player: 'cn.rongcloud.sdk:player:5.2.5'
+            face_beautifier: 'cn.rongcloud.sdk:face_beautifier:5.2.4'
+            player: 'cn.rongcloud.sdk:player:5.2.4'
     ]
 }
