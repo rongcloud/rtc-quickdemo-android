@@ -24,7 +24,7 @@ public:
       @return  0: 成功,非0: 失败。
      **/
     virtual int Decrypt(const uint8_t *encrypted_frame, size_t encrypted_frame_size,
-                        uint8_t *frame, size_t *bytes_written, std::string mediastream_id,
+                        uint8_t *frame, size_t *bytes_written, const char* mediastream_id,
                         int mediatype);
 
     /**
@@ -35,7 +35,7 @@ public:
      @return size_t 明文长度
      **/
     virtual size_t
-    GetMaxPlaintextByteSize(size_t frame_size, std::string mediastream_id, int mediatype);
+    GetMaxPlaintextByteSize(size_t frame_size, const char* mediastream_id, int mediatype);
 };
 
 #endif //ANDROID_WORKSPACE_CRYPTO_CUSTOM_VIDEO_FRAME_DECRYPTOR_H

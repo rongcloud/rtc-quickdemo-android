@@ -91,6 +91,11 @@ public class CalllibActivity extends AppCompatActivity {
             remote.removeAllViews();
         }
 
+        @Override
+        public void onCallIncoming(RongCallSession callSession, SurfaceView localVideo) {
+
+        }
+
         /**
          * 电话已拨出
          *
@@ -140,6 +145,11 @@ public class CalllibActivity extends AppCompatActivity {
         @Override
         public void onRemoteUserRinging(String uid) {
             Log.d(TAG, "onRemoteUserRinging uid = " + uid);
+
+        }
+
+        @Override
+        public void onRemoteUserAccept(String userId, RongCallCommon.CallMediaType mediaType) {
 
         }
 
@@ -217,6 +227,11 @@ public class CalllibActivity extends AppCompatActivity {
         @Override
         public void onFirstRemoteVideoFrame(String uid, int height, int width) {
             Log.d(TAG, "onFirstRemoteVideoFrame uid = " + uid + ", height = " + height + ", width = " + width);
+        }
+
+        @Override
+        public void onFirstRemoteAudioFrame(String userId) {
+
         }
 
         @Override

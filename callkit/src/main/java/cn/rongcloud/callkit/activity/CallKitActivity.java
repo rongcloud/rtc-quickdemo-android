@@ -50,7 +50,6 @@ public class CallKitActivity extends AppCompatActivity {
     }
 
     private void initClient() {
-        // FIXME: 4/22/21 为解决与CallLib同时依赖的冲突问题采用此种重新初始化方式,该方式会造成内存泄漏
         RongCallModule rongCallModule = new RongCallModule();
         rongCallModule.onInit(getApplicationContext(), APP_KEY);
         //正常情况下应采取以下方式初始化

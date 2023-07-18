@@ -24,7 +24,7 @@ public:
       @return  0: 成功,非0: 失败。
       **/
     virtual int Encrypt(const uint8_t *payload_data, size_t payload_size,
-                        uint8_t *encrypted_frame, size_t *bytes_written, std::string mediastream_id,
+                        uint8_t *encrypted_frame, size_t *bytes_written, const char* mediastream_id,
                         int mediatype);
 
     /**
@@ -35,7 +35,7 @@ public:
        @return size_t 密文长度
        **/
     virtual size_t
-    GetMaxCiphertextByteSize(size_t frame_size, std::string mediastream_id, int mediatype);
+    GetMaxCiphertextByteSize(size_t frame_size, const char* mediastream_id, int mediatype);
 };
 
 #endif //ANDROID_WORKSPACE_CRYPTO_CUSTOM_AUDIO_FRAME_ENCRYPTOR_H

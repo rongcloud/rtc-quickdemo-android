@@ -9,7 +9,7 @@ CustomAudioFrameEncryptor::CustomAudioFrameEncryptor(std::string mediastreamId)
 
 int CustomAudioFrameEncryptor::Encrypt(const uint8_t *payload_data, size_t payload_size,
                                        uint8_t *encrypted_frame, size_t *bytes_written,
-                                       std::string mediastream_id, int mediatype) {
+                                       const char* mediastream_id, int mediatype) {
     //在此处实现自己的音频加密算法，示例为按位取反
     uint8_t fake_key_ = 0xff;
     for (size_t i = 0; i < payload_size; i++) {
@@ -19,9 +19,8 @@ int CustomAudioFrameEncryptor::Encrypt(const uint8_t *payload_data, size_t paylo
     return 0;
 }
 
-size_t
-CustomAudioFrameEncryptor::GetMaxCiphertextByteSize(size_t frame_size, std::string mediastream_id,
+size_t CustomAudioFrameEncryptor::GetMaxCiphertextByteSize(size_t frame_size, const char* mediastream_id,
                                                     int mediatype) {
-    //加密之后数据帧大小
+    LOGI("custom_crypto. %s, %d mediastream_id:%s, mediatype:%d", __func__, __LINE__, mediastream_id, mediatype);
     return frame_size;
 }

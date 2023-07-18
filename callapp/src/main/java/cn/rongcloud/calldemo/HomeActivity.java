@@ -16,6 +16,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import io.rong.callkit.RongCallModule;
+import io.rong.imlib.RongCoreClient;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -42,14 +44,15 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-
-//        Intent intent = getIntent();
-//        mUserId = intent.getStringExtra(KEY_USER_ID);
-//        mUserIdTextView = findViewById(R.id.tv_userid);
-//        mUserIdTextView.setText(mUserIdTextView.getText() + mUserId);
+        mUserIdTextView = findViewById(R.id.tv_userid);
+        mUserIdTextView.setText("UserId: "+ RongCoreClient.getInstance().getCurrentUserId());
 
         initView();
         initData();
+
+        //因为 HomeActivity 和 CallKitActivity 会覆盖通话接听页面。所以在没有进入 CallKitActivity 页面前调用这个方法，防止被叫的接听页面弹不出来
+        RongCallModule rongCallModule = new RongCallModule();
+        rongCallModule.onInit(getApplicationContext(), APP_KEY);
     }
 
     @Override

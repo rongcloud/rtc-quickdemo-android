@@ -4,14 +4,15 @@
 
 package cn.rongcloud.demo.screenshare.ui.activity;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.res.Configuration;
 import android.media.MediaRecorder;
-import android.media.projection.MediaProjectionManager;
 import android.os.Build;
+import android.os.Build.VERSION;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.text.TextUtils;
@@ -25,7 +26,6 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,6 +33,12 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.transition.TransitionManager;
 
+import cn.rongcloud.rtc.api.stream.RCRTCScreenShareAudioConfig;
+import cn.rongcloud.rtc.api.stream.RCRTCScreenShareAudioConfig.Builder;
+import cn.rongcloud.rtc.api.stream.RCRTCScreenShareOutputStream;
+import cn.rongcloud.rtc.base.RCRTCParamsType.RCRTCScreenShareAudioUsage;
+import cn.rongcloud.rtc.base.RCRTCParamsType.RCRTCVideoFps;
+import cn.rongcloud.rtc.base.RCRTCParamsType.RCRTCVideoResolution;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,9 +46,7 @@ import java.util.Map;
 
 import cn.rongcloud.demo.common.UiUtils;
 import cn.rongcloud.demo.screenshare.R;
-import cn.rongcloud.demo.screenshare.service.ScreenCastService;
 import cn.rongcloud.demo.screenshare.ui.model.VideoViewWrapper;
-import cn.rongcloud.demo.screenshare.utils.ScreenShareUtil;
 import cn.rongcloud.rtc.api.RCRTCConfig;
 import cn.rongcloud.rtc.api.RCRTCEngine;
 import cn.rongcloud.rtc.api.RCRTCRemoteUser;
@@ -52,13 +56,13 @@ import cn.rongcloud.rtc.api.callback.IRCRTCResultDataCallback;
 import cn.rongcloud.rtc.api.callback.IRCRTCRoomEventsListener;
 import cn.rongcloud.rtc.api.stream.RCRTCInputStream;
 import cn.rongcloud.rtc.api.stream.RCRTCVideoInputStream;
-import cn.rongcloud.rtc.api.stream.RCRTCVideoOutputStream;
 import cn.rongcloud.rtc.api.stream.RCRTCVideoStreamConfig;
 import cn.rongcloud.rtc.api.stream.RCRTCVideoView;
 import cn.rongcloud.rtc.base.RCRTCMediaType;
 import cn.rongcloud.rtc.base.RCRTCParamsType;
 import cn.rongcloud.rtc.base.RCRTCStreamType;
 import cn.rongcloud.rtc.base.RTCErrorCode;
+import cn.rongcloud.rtc.core.RendererCommon;
 import io.rong.imlib.RongIMClient;
 
 
@@ -69,9 +73,11 @@ public class MeetingActivity extends AppCompatActivity {
     public static final String INTERFACE_NAME_LEAVE_ROOM = "INTERFACE_NAME_LEAVE_ROOM";
     public static final String INTERFACE_NAME_PUSH_STREAM = "INTERFACE_NAME_PUSH_STREAM";
     public static final String INTERFACE_NAME_SUBSCRIBE_STREAM = "INTERFACE_NAME_SUBSCRIBE_STREAM";
-    public static final String INTERFACE_NAME_START_DESKTOP_STREAM = "INTERFACE_NAME_START_DESKTOP_STREAM";
-    public static final String INTERFACE_NAME_STOP_DESKTOP_STREAM = "INTERFACE_NAME_STOP_DESKTOP_STREAM";
-    private static final String TAG = MeetingActivity.class.getName();
+    public static final String INTERFACE_NAME_START_DESKTOP_STREAM =
+            "INTERFACE_NAME_START_DESKTOP_STREAM";
+    public static final String INTERFACE_NAME_STOP_DESKTOP_STREAM =
+            "INTERFACE_NAME_STOP_DESKTOP_STREAM";
+    private static final String TAG = "VideoMeetingActivity";
     private static final int REQUEST_CODE = 10000;
 
 
@@ -102,8 +108,6 @@ public class MeetingActivity extends AppCompatActivity {
     // 记录是否已经绑定了Service
     private volatile boolean isBindDesktopShareService = false;
     private RCRTCRoom mRoom;
-    private ScreenShareUtil mScreenShareUtil;
-    private RCRTCVideoOutputStream mDesktopShareStream;
     private volatile boolean isDesktopSharing = false;
     private View mIvHangupButton;
     private View mIvMuteButton;
@@ -118,6 +122,7 @@ public class MeetingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate: ");
         setContentView(R.layout.activity_meeting);
         initValue();
         initActionBar();
@@ -128,11 +133,19 @@ public class MeetingActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+    }
+
+    @Override
     protected void onDestroy() {
+        Log.d(TAG, "onDestroy: ");
         unbindDesktopShare();
         leaveRoom();
         super.onDestroy();
     }
+
 
     private void initRoom() {
         joinRoom(mMeetingNumber);
@@ -197,8 +210,6 @@ public class MeetingActivity extends AppCompatActivity {
         RCRTCConfig config = RCRTCConfig.Builder.create()
                 .enableHardwareDecoder(true)
                 .enableHardwareEncoder(true)
-                // FIXME: 2021/5/10 开启之后会导致崩溃
-//                .enableLowLatencyRecording(true)
                 .setAudioSource(audioSource)
                 .build();
 
@@ -278,7 +289,6 @@ public class MeetingActivity extends AppCompatActivity {
             }
         });
     }
-
     /**
      * 根据 Video 数量重新布局
      *
@@ -297,7 +307,7 @@ public class MeetingActivity extends AppCompatActivity {
                     container.removeAllViews();
                     container.setTag(null);
                     container.addView(videoViewWrapper.getRCRTCVideoView(),
-                            new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+                        new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
                     container.setTag(videoViewWrapper);
                 }
             } else {
@@ -375,10 +385,14 @@ public class MeetingActivity extends AppCompatActivity {
         for (ViewGroup viewGroup : videoContainerArray) {
             if (viewGroup == view) {
                 //设置点击的视频为全屏
-                constraintSet.connect(view.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
-                constraintSet.connect(view.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP);
-                constraintSet.connect(view.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
-                constraintSet.connect(view.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
+                constraintSet.connect(view.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID,
+                        ConstraintSet.START);
+                constraintSet.connect(view.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID,
+                        ConstraintSet.TOP);
+                constraintSet.connect(view.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID,
+                        ConstraintSet.END);
+                constraintSet.connect(view.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID
+                        , ConstraintSet.BOTTOM);
                 constraintSet.constrainPercentHeight(view.getId(), 1);
                 constraintSet.constrainDefaultWidth(view.getId(), 1);
                 currentFullVideoWrapper = (VideoViewWrapper) viewGroup.getTag();
@@ -403,6 +417,7 @@ public class MeetingActivity extends AppCompatActivity {
      */
     private void handlerDesktopSharing() {
         if (isDesktopSharing) {
+            UiUtils.showWaitingDialog(this);
             stopDesktopSharing();
         } else {
             requestScreenCapture();
@@ -411,43 +426,63 @@ public class MeetingActivity extends AppCompatActivity {
 
     /**
      * 请求桌面录制权限
+     * todo 开发者文档地址为：https://doc.rongcloud.cn/meeting/Android/5.X/advance/screen-share#captureScreen
      */
     private void requestScreenCapture() {
-        MediaProjectionManager mediaProjectionManager = (MediaProjectionManager) this.getSystemService(Context.MEDIA_PROJECTION_SERVICE);
-        startActivityForResult(mediaProjectionManager.createScreenCaptureIntent(), REQUEST_CODE);
+        RCRTCVideoStreamConfig.Builder builder = RCRTCVideoStreamConfig.Builder.create();
+        builder.setVideoFps(RCRTCVideoFps.Fps_15);
+        builder.setVideoResolution(RCRTCVideoResolution.RESOLUTION_720_1280);
+        builder.setMaxRate(2500);
+        RCRTCEngine.getInstance().getScreenShareVideoStream().setVideoConfig(builder.build());
+        RCRTCEngine.getInstance().getScreenShareVideoStream().startCaptureScreen(new IRCRTCResultCallback() {
+            @Override
+            public void onSuccess() {
+                Log.d(TAG, "capture screen onSuccess: []");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (VERSION.SDK_INT >= VERSION_CODES.Q) {
+                            RCRTCScreenShareAudioConfig build = Builder.create()
+                                .addMatchingUsage(RCRTCScreenShareAudioUsage.MEDIA)
+                                .addMatchingUsage(RCRTCScreenShareAudioUsage.GAME)
+                                .addMatchingUsage(RCRTCScreenShareAudioUsage.UNKNOWN)
+                                .build();
+                            RCRTCEngine.getInstance().getScreenShareVideoStream().startCaptureAudio(build, new IRCRTCResultCallback() {
+                                @Override
+                                public void onSuccess() {
+                                }
+
+                                @Override
+                                public void onFailed(RTCErrorCode errorCode) {
+                                }
+                            });
+                        }
+                    }
+                });
+                mRoom.getLocalUser().publishStream(RCRTCEngine.getInstance().getScreenShareVideoStream(), new IRCRTCResultCallback() {
+                    @Override
+                    public void onSuccess() {
+                        onDesktopShareSuccess();
+                        initScreenShareVideoView();
+                        isDesktopSharing = true;
+                        Log.d(TAG, "publish screen onSuccess: ");
+                    }
+
+                    @Override
+                    public void onFailed(RTCErrorCode errorCode) {
+                        Log.d(TAG, "publish onFailed: ");
+                        RCRTCEngine.getInstance().getScreenShareVideoStream().stopCaptureScreen();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailed(RTCErrorCode errorCode) {
+                Log.d(TAG, "onFailed: ");
+            }
+        });
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            createVirtualDisplay(data);
-        }
-    }
-
-    private void createVirtualDisplay(final Intent data) {
-        // 如果 SDK 版本大于28，需要启动一个前台service来录屏
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            Intent service = new Intent(this, ScreenCastService.class);
-            serviceConnection = new ServiceConnection() {
-                @Override
-                public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-                    Log.d(TAG, "onServiceConnected: ");
-                    startDesktopSharing(data);
-                }
-
-                @Override
-                public void onServiceDisconnected(ComponentName componentName) {
-                    Log.d(TAG, "onServiceDisconnected: ");
-                }
-            };
-            bindService(service, serviceConnection, BIND_AUTO_CREATE);
-            isBindDesktopShareService = true;
-        } else {
-            startDesktopSharing(data);
-        }
-
-    }
 
     private void onDesktopShareSuccess() {
         runOnUiThread(new Runnable() {
@@ -465,7 +500,8 @@ public class MeetingActivity extends AppCompatActivity {
      * @param interfaceName 发生错误的接口回调名
      * @param rtcErrorCode  错误信息
      */
-    private void onFiledCallBack(@NonNull String interfaceName, @NonNull RTCErrorCode rtcErrorCode) {
+    private void onFiledCallBack(@NonNull String interfaceName,
+                                 @NonNull RTCErrorCode rtcErrorCode) {
         switch (interfaceName) {
             case INTERFACE_NAME_JOIN_ROOM:
                 Log.d(TAG, "加入房间失败 : " + rtcErrorCode.getReason());
@@ -527,36 +563,6 @@ public class MeetingActivity extends AppCompatActivity {
             handlerDesktopSharing();
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * 开始桌面共享
-     */
-    private void startDesktopSharing(@NonNull Intent data) {
-        UiUtils.showWaitingDialog(this);
-        RCRTCVideoStreamConfig.Builder videoConfigBuilder = RCRTCVideoStreamConfig.Builder.create();
-        videoConfigBuilder.setVideoResolution(RCRTCParamsType.RCRTCVideoResolution.RESOLUTION_720_1280);
-        videoConfigBuilder.setVideoFps(RCRTCParamsType.RCRTCVideoFps.Fps_15);
-        videoConfigBuilder.setMinRate(250);
-        videoConfigBuilder.setMaxRate(2200);
-        mDesktopShareStream = RCRTCEngine.getInstance().createVideoStream("ScreenShare", videoConfigBuilder.build());
-        mScreenShareUtil = new ScreenShareUtil();
-        mScreenShareUtil.init(this, mDesktopShareStream, data, 720, 1080);
-        mRoom.getLocalUser().publishStream(mDesktopShareStream, new IRCRTCResultCallback() {
-            @Override
-            public void onSuccess() {
-                onDesktopShareSuccess();
-                isDesktopSharing = true;
-                UiUtils.hideWaitingDialog();
-            }
-
-            @Override
-            public void onFailed(RTCErrorCode rtcErrorCode) {
-                Log.d(TAG, "startDesktopSharing:onFailed: ");
-                UiUtils.hideWaitingDialog();
-                onFiledCallBack(INTERFACE_NAME_START_DESKTOP_STREAM, rtcErrorCode);
-            }
-        });
     }
 
     /**
@@ -627,7 +633,8 @@ public class MeetingActivity extends AppCompatActivity {
 
             @Override
             public void onFailed(RTCErrorCode errorCode) {
-                Log.e(TAG, "publishDefaultAVStream:publishDefaultStreams:onFailed: " + errorCode.getReason());
+                Log.e(TAG,
+                        "publishDefaultAVStream:publishDefaultStreams:onFailed: " + errorCode.getReason());
                 onFiledCallBack(INTERFACE_NAME_PUSH_STREAM, errorCode);
             }
         });
@@ -651,7 +658,9 @@ public class MeetingActivity extends AppCompatActivity {
                     //选择订阅大流或是小流。默认小流
                     ((RCRTCVideoInputStream) inputStream).setStreamType(RCRTCStreamType.NORMAL);
                     //创建VideoView并设置到stream
-                    VideoViewWrapper videoViewWrapper = createVideoViewByStreamId(inputStream.getStreamId(), remoteUser.getUserId());
+                    VideoViewWrapper videoViewWrapper =
+                            createVideoViewByStreamId(inputStream.getStreamId(),
+                                    remoteUser.getUserId());
                     ((RCRTCVideoInputStream) inputStream).setVideoView(videoViewWrapper.getRCRTCVideoView());
                     //将远端视图添加至布局
                     addVideoViewToList(videoViewWrapper);
@@ -721,7 +730,14 @@ public class MeetingActivity extends AppCompatActivity {
     }
 
     private VideoViewWrapper createVideoViewByStreamId(String streamId, String userId) {
-        RCRTCVideoView videoView = new RCRTCVideoView(getApplicationContext());
+        final RCRTCVideoView videoView = new RCRTCVideoView(getApplicationContext());
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                videoView.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
+            }
+        });
+
         return new VideoViewWrapper(userId, streamId, videoView);
     }
 
@@ -742,39 +758,57 @@ public class MeetingActivity extends AppCompatActivity {
         RCRTCEngine.getInstance().getDefaultVideoStream().startCamera(null);
     }
 
-    /**
-     * 结束桌面共享
-     */
-    private void stopDesktopSharing() {
-        if (mDesktopShareStream != null) {
-            UiUtils.showWaitingDialog(this);
-            mRoom.getLocalUser().unpublishStream(mDesktopShareStream, new IRCRTCResultCallback() {
-                @Override
-                public void onSuccess() {
-                    releaseScreenShareUtil();
-                    onDesktopShareStopSuccess();
-                    isDesktopSharing = false;
-                    UiUtils.hideWaitingDialog();
+    private void initScreenShareVideoView(){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                RCRTCVideoView localVideoView = new RCRTCVideoView(getApplicationContext());
+                localVideoView.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
+                VideoViewWrapper videoViewWrapper =
+                        new VideoViewWrapper(RCRTCEngine.getInstance().getScreenShareVideoStream().getStreamId(), localVideoView);
+                //确保本地视频始终处于第一个
+                synchronized (this) {
+                    mVideoViewList.add(videoViewWrapper);
+                    mVideoViewWrapperMap.put(videoViewWrapper.getStreamId(), videoViewWrapper);
                 }
+                onShowVideoViewChange(mVideoViewList);
+                RCRTCEngine.getInstance().getScreenShareVideoStream().setVideoView(localVideoView);
+            }
+        });
+    }
 
-                @Override
-                public void onFailed(RTCErrorCode rtcErrorCode) {
-                    releaseScreenShareUtil();
-                    Log.d(TAG, "stopDesktopSharing:onFailed: " + rtcErrorCode.getReason());
-                    UiUtils.hideWaitingDialog();
-                    onFiledCallBack(INTERFACE_NAME_STOP_DESKTOP_STREAM, rtcErrorCode);
-                }
-            });
+    private void unInitScreenShareVideoView(){
+
+        VideoViewWrapper viewWrapper =
+                mVideoViewWrapperMap.remove(RCRTCEngine.getInstance().getScreenShareVideoStream().getStreamId());
+        Log.d(TAG, "unInitScreenShareVideoView: viewList: " + mVideoViewList.size());
+        if (viewWrapper != null){
+            mVideoViewList.remove(viewWrapper);
+            Log.d(TAG, "unInitScreenShareVideoView: after size: " + mVideoViewList.size());
+            onShowVideoViewChange(mVideoViewList);
         }
     }
 
     /**
-     * 释放桌面共享资源
+     * 结束桌面共享
      */
-    private void releaseScreenShareUtil() {
-        if (mScreenShareUtil != null) {
-            mScreenShareUtil.release();
-        }
+    private void stopDesktopSharing() {
+        mRoom.getLocalUser().unpublishStream(RCRTCEngine.getInstance().getScreenShareVideoStream(), new IRCRTCResultCallback() {
+            @Override
+            public void onSuccess() {
+                UiUtils.hideWaitingDialog();
+                isDesktopSharing = false;
+            }
+
+            @Override
+            public void onFailed(RTCErrorCode errorCode) {
+                UiUtils.hideWaitingDialog();
+                isDesktopSharing = false;
+            }
+        });
+        RCRTCEngine.getInstance().getScreenShareVideoStream().stopCaptureScreen();
+        unInitScreenShareVideoView();
+        onDesktopShareStopSuccess();
     }
 
     private void showToast(String message) {
@@ -793,14 +827,16 @@ public class MeetingActivity extends AppCompatActivity {
          * @param streams    发布的资源
          */
         @Override
-        public void onRemoteUserPublishResource(RCRTCRemoteUser remoteUser, List<RCRTCInputStream> streams) {
+        public void onRemoteUserPublishResource(RCRTCRemoteUser remoteUser,
+                                                List<RCRTCInputStream> streams) {
             for (RCRTCInputStream inputStream : streams) {
                 if (inputStream.getMediaType() == RCRTCMediaType.VIDEO) {
                     // 选择订阅大流或是小流。默认小流
                     ((RCRTCVideoInputStream) inputStream).setStreamType(RCRTCStreamType.NORMAL);
                     // 创建VideoView并设置到stream
                     VideoViewWrapper videoViewWrapper =
-                            createVideoViewByStreamId(inputStream.getStreamId(), remoteUser.getUserId());
+                            createVideoViewByStreamId(inputStream.getStreamId(),
+                                    remoteUser.getUserId());
                     ((RCRTCVideoInputStream) inputStream).setVideoView(videoViewWrapper.getRCRTCVideoView());
                     // 将远端视图添加至布局
                     addVideoViewToList(videoViewWrapper);
@@ -830,7 +866,8 @@ public class MeetingActivity extends AppCompatActivity {
          * @param mute       true表示静音，false表示取消静音
          */
         @Override
-        public void onRemoteUserMuteAudio(RCRTCRemoteUser remoteUser, RCRTCInputStream stream, boolean mute) {
+        public void onRemoteUserMuteAudio(RCRTCRemoteUser remoteUser, RCRTCInputStream stream,
+                                          boolean mute) {
         }
 
 
@@ -842,7 +879,8 @@ public class MeetingActivity extends AppCompatActivity {
          * @param mute       true表示关闭，false表示打开
          */
         @Override
-        public void onRemoteUserMuteVideo(RCRTCRemoteUser remoteUser, RCRTCInputStream stream, boolean mute) {
+        public void onRemoteUserMuteVideo(RCRTCRemoteUser remoteUser, RCRTCInputStream stream,
+                                          boolean mute) {
 
         }
 
@@ -853,7 +891,8 @@ public class MeetingActivity extends AppCompatActivity {
          * @param remoteUser 远端用户
          */
         @Override
-        public void onRemoteUserUnpublishResource(RCRTCRemoteUser remoteUser, List<RCRTCInputStream> streams) {
+        public void onRemoteUserUnpublishResource(RCRTCRemoteUser remoteUser,
+                                                  List<RCRTCInputStream> streams) {
             Log.d(TAG, "onRemoteUserUnpublishResource: ");
             for (RCRTCInputStream stream : streams) {
                 removeVideoByStreamId(stream.getStreamId());

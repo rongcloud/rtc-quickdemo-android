@@ -68,8 +68,8 @@ public class MeetingActivity extends AppCompatActivity implements MeetingPresent
         isEncryption = intent.getBooleanExtra(KEY_IS_ENCRYPTION, false);
         mMeetingPresenter = new MeetingPresenter();
         mMeetingPresenter.attachView(this);
-        mMeetingPresenter.config(this, isEncryption);
-        mMeetingPresenter.joinRoom(mRoomId);
+        mMeetingPresenter.config(this);
+        mMeetingPresenter.joinRoom(mRoomId,isEncryption);
 
         initBackButton();
         initTitle();

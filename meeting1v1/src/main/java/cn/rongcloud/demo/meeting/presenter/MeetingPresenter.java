@@ -200,19 +200,14 @@ public class MeetingPresenter {
     /**
      * 配置rtc sdk
      */
-    public void config(Context context, boolean isEncryption) {
+    public void config(Context context) {
 
         RCRTCConfig.Builder configBuilder = RCRTCConfig.Builder.create();
         // 是否硬解码
         configBuilder.enableHardwareDecoder(true);
         // 是否硬编码
         configBuilder.enableHardwareEncoder(true);
-        // 是否使用自定义加密
-        configBuilder.enableAudioEncryption(isEncryption);
-        configBuilder.enableVideoEncryption(isEncryption);
 
-        // init 需结合 uninit 使用，否则有些配置无法重新初始化
-        RCRTCEngine.getInstance().unInit();
         RCRTCEngine.getInstance().init(context, configBuilder.build());
 
         RCRTCVideoStreamConfig.Builder videoConfigBuilder = RCRTCVideoStreamConfig.Builder.create();
@@ -236,10 +231,12 @@ public class MeetingPresenter {
         RCRTCEngine.getInstance().enableSpeaker(false);
     }
 
-    public void joinRoom(String roomId) {
+    public void joinRoom(String roomId, boolean isEncryption) {
         RCRTCRoomConfig roomConfig = RCRTCRoomConfig.Builder.create()
                 // 根据实际场景，选择音视频直播：LIVE_AUDIO_VIDEO 或音频直播：LIVE_AUDIO
                 .setRoomType(RCRTCRoomType.MEETING)
+            .enableAudioEncryption(isEncryption)
+            .enableVideoEncryption(isEncryption)
                 .build();
         RCRTCEngine.getInstance().joinRoom(roomId, roomConfig, new IRCRTCResultDataCallback<RCRTCRoom>() {
             @Override

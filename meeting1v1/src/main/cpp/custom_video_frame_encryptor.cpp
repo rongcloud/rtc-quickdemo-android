@@ -6,8 +6,8 @@ CustomVideoFrameEncryptor::CustomVideoFrameEncryptor(std::string mediastream_id)
 }
 
 int CustomVideoFrameEncryptor::Encrypt(const uint8_t *payload_data, size_t payload_size,
-                                       uint8_t *encrypted_frame, size_t *bytes_written,
-                                       std::string mediastream_id, int mediatype) {
+                                           uint8_t *encrypted_frame, size_t *bytes_written,
+                                           const char* mediastream_id, int mediatype) {
 
     uint8_t fake_key_ = 0xff;
     for (size_t i = 0; i < payload_size; i++) {
@@ -18,8 +18,8 @@ int CustomVideoFrameEncryptor::Encrypt(const uint8_t *payload_data, size_t paylo
 }
 
 size_t
-CustomVideoFrameEncryptor::GetMaxCiphertextByteSize(size_t frame_size, std::string mediastream_id,
+CustomVideoFrameEncryptor::GetMaxCiphertextByteSize(size_t frame_size, const char* mediastream_id,
                                                     int mediatype) {
-    //加密之后数据帧大小
+    LOGI("custom_crypto. %s, %d mediastream_id:%s, mediatype:%d", __func__, __LINE__, mediastream_id, mediatype);
     return frame_size;
 }

@@ -57,6 +57,7 @@ public class LiveActivity extends AppCompatActivity {
     public static final String KEY_ROLE = "role_type";
     private static final String TAG = "LiveActivity";
     private static final String DEFAULT_FILE_STREAM_NAME = "file:///android_asset/video_1.mp4";
+    private static final boolean FACE_BEAUTY_ENABLE = true;
     /**
      * 创建 BeautyFilter 事件
      */
@@ -93,7 +94,7 @@ public class LiveActivity extends AppCompatActivity {
     private MenuItem mBeautyMenuItem;
     private BeautySheetDialog beautySheetDialog;
     // 美颜开关状态
-    private volatile boolean mBeautyStatus = false;
+    private volatile boolean mBeautyStatus = FACE_BEAUTY_ENABLE;
     private VideoFilterHandler mVideoFilterHandler = null;
     private MenuItem mMenuFileStreamItem;
     private MenuItem mMenuUsbStreamItem;
@@ -289,7 +290,7 @@ public class LiveActivity extends AppCompatActivity {
             return true;
         } else if (item.getItemId() == R.id.beauty_action_btn) {
             // 响应美颜按钮点击事件
-            handleBeautyStatusChange(!mBeautyStatus);
+            handleBeautyStatusChange(!mBeautyStatus, true);
         } else if (item.getItemId() == R.id.filestream_action_btn) {
             if (mMenuFileStreamStatus == PushFileStreamStatus.BackDoing) {
 
@@ -315,14 +316,16 @@ public class LiveActivity extends AppCompatActivity {
      *
      * @param beautyStatus
      */
-    private void handleBeautyStatusChange(boolean beautyStatus) {
+    private void handleBeautyStatusChange(boolean beautyStatus, boolean showDialog) {
 
-	if (mBeautyMenuItem != null) {
+	    if (mBeautyMenuItem != null) {
             mBeautyStatus = beautyStatus;
             if (mBeautyStatus){
                 beautyBtn.setEnabled(true);
-                showBeautyDialog();
-            }else {
+                if (showDialog) {
+                    showBeautyDialog();
+                }
+            } else {
                 beautyBtn.setEnabled(false);
                 RCRTCBeautyEngine.getInstance().reset();
             }
@@ -419,7 +422,7 @@ public class LiveActivity extends AppCompatActivity {
         mBeautyMenuItem = menu.findItem(R.id.beauty_action_btn);
         mMenuFileStreamItem = menu.findItem(R.id.filestream_action_btn);
         mMenuUsbStreamItem = menu.findItem(R.id.usbstream_action_btn);
-        handleBeautyStatusChange(false);
+        handleBeautyStatusChange(FACE_BEAUTY_ENABLE, false);
         return super.onCreateOptionsMenu(menu);
     }
 

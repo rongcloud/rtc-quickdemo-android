@@ -9,8 +9,7 @@
 
         <activity
             android:name=".ui.activity.MeetingActivity"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|keyboardHidden"
             android:theme="@style/Theme.AppCompat.Light" />
 
         <activity
@@ -18,11 +17,11 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light" />
 
+        <activity android:name="cn.rongcloud.rtc.api.stream.RCRTCScreenShareActivity"/>
         <service
-            android:name=".service.ScreenCastService"
-            android:enabled="true"
-            android:foregroundServiceType="mediaProjection" />
-
+          android:name="cn.rongcloud.rtc.api.stream.RCRTCScreenShareService"
+          android:enabled="true"
+          android:foregroundServiceType="mediaProjection" />
     </application>
 
 </manifest>

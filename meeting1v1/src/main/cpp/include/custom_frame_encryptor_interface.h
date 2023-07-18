@@ -8,10 +8,14 @@ namespace webrtc {
     class CustomFrameEncryptorInterface {
     public:
         CustomFrameEncryptorInterface(std::string mediastream_id) {
-            mediastream_id_ = mediastream_id;
+            int len = strlen(mediastream_id.c_str()) + 1;
+            mediastream_id_ = new char[len];
+            strncpy(mediastream_id_, mediastream_id.c_str(), len);
         }
 
-        virtual ~CustomFrameEncryptorInterface() {}
+        virtual ~CustomFrameEncryptorInterface() {
+            delete [] mediastream_id_;
+        }
 
         /**
          自定义加密方法
@@ -25,7 +29,7 @@ namespace webrtc {
          **/
         virtual int Encrypt(const uint8_t *payload_data, size_t payload_size,
                             uint8_t *encrypted_frame, size_t *bytes_written,
-                            std::string mediastream_id, int mediatype) = 0;
+                            const char* mediastream_id, int mediatype) = 0;
 
         /**
         *计算加密后数据的长度
@@ -34,19 +38,19 @@ namespace webrtc {
         @param  mediatype 媒体类型, 0为"audio" 1为"video"
         @return size_t 密文长度
         **/
-        virtual size_t GetMaxCiphertextByteSize(size_t frame_size, std::string mediastream_id,
+        virtual size_t GetMaxCiphertextByteSize(size_t frame_size, const char* mediastream_id,
                                                 int mediatype) = 0;
 
         /**
          *返回当前音频或视频流的名称。用于内部调用，客户无需修改。
-         @return std::string 当前音频或视频流的名称
+         @return const char* 当前音频或视频流的名称
          **/
-        virtual std::string GetMediaStreamId() const {
+        virtual const char* GetMediaStreamId() const {
             return mediastream_id_;
         }
 
     private:
-        std::string mediastream_id_;
+        char* mediastream_id_;
     };
 }
 

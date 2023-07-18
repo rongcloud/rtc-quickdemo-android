@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -26,6 +27,7 @@ import cn.rongcloud.demo.screenshare.R;
 public class CreateMeetingActivity extends AppCompatActivity {
 
     private AppCompatEditText etRoomNumber;
+    private static final String TAG = "CreateMeetingActivity";
 
     public static void startActivity(@NonNull Context context) {
         Intent intent = new Intent(context, CreateMeetingActivity.class);
@@ -35,11 +37,29 @@ public class CreateMeetingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate: ");
         setContentView(R.layout.activity_desktop_sharing);
         initActionBar();
         initView();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(TAG, "onResume: ");
+    }
+
+    @Override
+    protected void onStop() {
+        Log.d(TAG, "onStop: ");
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: ");
+    }
 
     private void initView() {
         etRoomNumber = findViewById(R.id.et_room_number);

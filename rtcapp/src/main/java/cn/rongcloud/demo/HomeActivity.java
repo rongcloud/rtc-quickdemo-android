@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -17,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import cn.rongcloud.demo.cdn.CDNMainActivity;
+import io.rong.imlib.RongCoreClient;
 import java.util.Arrays;
 import java.util.List;
 
@@ -77,12 +79,15 @@ public class HomeActivity extends AppCompatActivity {
                 })
     );
     private final HomeListAdapter adapter = new HomeListAdapter(modelList);
+    private TextView mUserIdTextView = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         ((RecyclerView) findViewById(R.id.rv_list)).setAdapter(adapter);
+        mUserIdTextView = findViewById(R.id.tv_userid);
+        mUserIdTextView.setText("UserID: "+ RongCoreClient.getInstance().getCurrentUserId());
     }
 
     @Override

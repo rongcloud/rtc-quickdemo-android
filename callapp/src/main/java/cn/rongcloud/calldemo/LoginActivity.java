@@ -105,8 +105,13 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onGetTokenFailed(String code) {
-                UiUtils.hideWaitingDialog();
-                Toast.makeText(LoginActivity.this, "获取 Token 失败，code = " + code, Toast.LENGTH_SHORT).show();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        UiUtils.hideWaitingDialog();
+                        Toast.makeText(LoginActivity.this, "获取 Token 失败，code = " + code, Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
     }
@@ -124,8 +129,13 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onError(RongIMClient.ConnectionErrorCode code) {
-                UiUtils.hideWaitingDialog();
-                Toast.makeText(LoginActivity.this, "连接融云 IM 服务失败，code = " + code, Toast.LENGTH_SHORT).show();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        UiUtils.hideWaitingDialog();
+                        Toast.makeText(LoginActivity.this, "连接融云 IM 服务失败，code = " + code, Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
