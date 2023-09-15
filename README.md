@@ -27,13 +27,13 @@
 * 示例应用与组件目录下的 README 分别列出了具体的前提条件要求。
 * 示例应用需要有 App Key 才能换取客户端连接融云服务器的身份凭证。请开通融云开发者账号，并在后台 [获取 App Key](https://developer.rongcloud.cn/app/appkey)。
 * 使用 Android Studio 3.0 或以上版本。如果您尚未安装，请在 [官网下载](https://developer.android.com/studio/index.html) 并安装。
-* Android SDK 4.4 或以上版本，即 minSdkVersion >= 19。
+* Android SDK 5.0 或以上版本，即 minSdkVersion >= 21。
 * Android Build Tools 21 或以上版本。为获得更好的编译体验，建议使用最新版。
-* JDK 1.7 或以上版本。
+* JDK 1.8 或以上版本。
 
 ## 设置设备
 
-示例应用必须部署到搭载 Android 4.4 或更高版本的 Android 设备或 Android 模拟器。
+示例应用必须部署到搭载 Android 5.0 或更高版本的 Android 设备或 Android 模拟器。
 
 * 如要使用 Android 设备，请按照在[硬件设备上运行应用](https://developer.android.com/studio/run/device.html)中的说明进行操作。
 * 如要使用 Android 模拟器，您可以使用 [Android Studio 附带的 Android 虚拟设备 (AVD)](https://developer.android.com/studio/run/managing-avds.html) 管理器创建虚拟设备并安装模拟器。

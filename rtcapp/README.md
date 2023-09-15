@@ -1,6 +1,6 @@
-# 融云音视频会议与直播 Android 示例应用
+# 融云音视频 Android 示例应用
 
-本示例应用为一个演示集合，集中演示[融云实时音视频 Android SDK] 支持的[音视频会议]与[低延迟直播]场景与功能，适用于不含呼叫流程的音视频业务场景。
+本示例应用为一个演示集合，集中演示[融云实时音视频 Android SDK] 支持的[音视频会议]、[音视频通话]与[低延迟直播]场景与功能。
 
 <p align="center" style="background-color: #e1e5eb; padding: 10px; margin-top: 5px; margin-bottom:5px;">
 <img src="../images/rtcapp-demo.png" width="20%">
@@ -13,22 +13,22 @@
 * 示例应用与组件目录下的 README 分别列出了具体的前提条件要求。
 * 示例应用需要有 App Key 才能换取客户端连接融云服务器的身份凭证。请开通融云开发者账号，并在后台 [获取 App Key](https://developer.rongcloud.cn/app/appkey)。
 * 使用 Android Studio 3.0 或以上版本。如果您尚未安装，请在 [官网下载](https://developer.android.com/studio/index.html) 并安装。
-* Android SDK 4.4 或以上版本，即 minSdkVersion >= 19。
+* Android SDK 5.0 或以上版本，即 minSdkVersion >= 21。
 * Android Build Tools 21 或以上版本。为获得更好的编译体验，建议使用最新版。
-* JDK 1.7 或以上版本。
-* Gradle 3.0 及以上版本。
+* JDK 1.8 或以上版本。
+* Gradle 4.0 及以上版本。
 
 具体参考如下设置：
         
 ```groovy
-compileSdkVersion: 30,
+compileSdkVersion: 33,
 minSdkVersion    : 21,
-targetSdkVersion : 27,
+targetSdkVersion : 29,
 ```
 
 ## 设置设备
 
-本示例应用必须部署到搭载 Android 4.4 或更高版本的 Android 设备或 Android 模拟器。
+本示例应用必须部署到搭载 Android 5.0 或更高版本的 Android 设备或 Android 模拟器。
 
 * 如要使用 Android 设备，请按照在[硬件设备上运行应用](https://developer.android.com/studio/run/device.html)中的说明进行操作。
 * 如要使用 Android 模拟器，您可以使用 [Android Studio 附带的 Android 虚拟设备 (AVD)](https://developer.android.com/studio/run/managing-avds.html) 管理器创建虚拟设备并安装模拟器。
@@ -68,13 +68,15 @@ implementation project(path: ':meeting1v1')
 implementation project(path: ':live')
 implementation project(path: ':screenshare')
 implementation project(path: ':cdnlivestream')
+implementation project(path: ':callplus')
 implementation rootProject.ext.dependencies.im_lib
 ```
 
 ## 文档
 
-- [音视频会议文档]
-- [低延迟直播文档]
+- [音视频通话（CallLib/Kit）文档]
+- [音视频通话（CallPlus）文档]
+- [音视频直播/会议文档]
 
 ## 支持
 
@@ -96,11 +98,11 @@ Demo 源码遵循 MIT 开源协议。
 
 <!-- links to docs -->
 
-[音视频通话文档]: https://docs.rongcloud.cn/v4/5X/views/rtc/call/intro/ability.html
+[音视频通话（CallLib/Kit）文档]: https://doc.rongcloud.cn/call/Android/5.X/demo
 
-[音视频会议文档]: https://docs.rongcloud.cn/v4/5X/views/rtc/meeting/ios/intro/intro.html
+[音视频通话（CallPlus）文档]: https://doc.rongcloud.cn/callplus/Android/1.X/make-first-call
 
-[低延迟直播文档]: https://docs.rongcloud.cn/v4/5X/views/rtc/livevideo/ios/intro/intro.html
+[音视频直播/会议文档]: https://doc.rongcloud.cn/rtc/Android/5.X/demo
 
 <!-- links to ops -->
 
