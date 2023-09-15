@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">callLib</string>
+    <string name="accept">接听</string>
+    <string name="hang_up">挂断</string>
+    <string name="call">呼叫</string>
+    <string name="call_on">通话中</string>
+    <string name="call_invite">有人呼叫你...</string>
+    <string name="call_outgoing">呼叫中...</string>
+    <string name="accept_success">接听成功</string>
+    <string name="call_status">--</string>
+    <string name="switch_camera">切换摄像头</string>
+    <string name="stop_camera">关闭摄像头</string>
+    <string name="start_camera">打开摄像头</string>
+    <string name="enableMicrophoneNo">关闭麦克风</string>
+    <string name="enableMicrophoneYes">打开麦克风</string>
+    <string name="enableSpeakerNo">切换为听筒</string>
+    <string name="enableSpeakerYes">切换为扬声器</string>
+    <string name="default_time">00:00</string>
+</resources>

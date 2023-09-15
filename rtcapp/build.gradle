@@ -36,6 +36,10 @@ dependencies {
     implementation project(path: ':live')
     implementation project(path: ':screenshare')
     implementation project(path: ':cdnlivestream')
+    implementation project(path: ':callkit')
+    implementation project(path: ':calllib')
+    implementation project(path: ':callplus')
+    implementation 'androidx.multidex:multidex:2.0.1'
     implementation rootProject.ext.dependencies.im_lib
 
     implementation 'androidx.appcompat:appcompat:1.1.0'

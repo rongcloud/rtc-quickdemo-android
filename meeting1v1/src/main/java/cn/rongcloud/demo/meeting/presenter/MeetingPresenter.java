@@ -16,6 +16,7 @@ import cn.rongcloud.rtc.api.callback.IRCRTCRoomEventsListener;
 import cn.rongcloud.rtc.api.stream.RCRTCInputStream;
 import cn.rongcloud.rtc.api.stream.RCRTCVideoInputStream;
 import cn.rongcloud.rtc.api.stream.RCRTCVideoStreamConfig;
+import cn.rongcloud.rtc.base.RCRTCJoinType;
 import cn.rongcloud.rtc.base.RCRTCMediaType;
 import cn.rongcloud.rtc.base.RCRTCParamsType;
 import cn.rongcloud.rtc.base.RCRTCRoomType;
@@ -208,6 +209,8 @@ public class MeetingPresenter {
         // 是否硬编码
         configBuilder.enableHardwareEncoder(true);
 
+        // init 需结合 uninit 使用，否则有些配置无法重新初始化
+        RCRTCEngine.getInstance().unInit();
         RCRTCEngine.getInstance().init(context, configBuilder.build());
 
         RCRTCVideoStreamConfig.Builder videoConfigBuilder = RCRTCVideoStreamConfig.Builder.create();
@@ -235,8 +238,8 @@ public class MeetingPresenter {
         RCRTCRoomConfig roomConfig = RCRTCRoomConfig.Builder.create()
                 // 根据实际场景，选择音视频直播：LIVE_AUDIO_VIDEO 或音频直播：LIVE_AUDIO
                 .setRoomType(RCRTCRoomType.MEETING)
-            .enableAudioEncryption(isEncryption)
-            .enableVideoEncryption(isEncryption)
+                .enableAudioEncryption(isEncryption)
+                .enableVideoEncryption(isEncryption)
                 .build();
         RCRTCEngine.getInstance().joinRoom(roomId, roomConfig, new IRCRTCResultDataCallback<RCRTCRoom>() {
             @Override

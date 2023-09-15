@@ -4,6 +4,7 @@
 
 package cn.rongcloud.demo;
 
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ public class HomeListAdapter extends RecyclerView.Adapter<HomeListAdapter.HomeIt
 
     public static class HomeItemHolder extends RecyclerView.ViewHolder {
         AppCompatImageView ivIcon;
+        AppCompatImageView ivExIcon;
         AppCompatTextView tvTitle;
         AppCompatTextView tvDescription;
 
@@ -28,6 +30,8 @@ public class HomeListAdapter extends RecyclerView.Adapter<HomeListAdapter.HomeIt
             ivIcon = itemView.findViewById(R.id.iv_icon);
             tvTitle = itemView.findViewById(R.id.tv_title);
             tvDescription = itemView.findViewById(R.id.tv_description);
+            ivExIcon = itemView.findViewById(R.id.iv_ex_icon);
+            tvTitle.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
         }
     }
 
@@ -37,7 +41,18 @@ public class HomeListAdapter extends RecyclerView.Adapter<HomeListAdapter.HomeIt
         public String desc;
         @DrawableRes
         public int icon;
+        @DrawableRes
+        public int exIcon;
         public View.OnClickListener clickListener;
+
+        public HomeListItemModel(int index, String title, String description, @DrawableRes int icon,@DrawableRes int exIcon, View.OnClickListener onClickListener) {
+            this.index = index;
+            this.title = title;
+            desc = description;
+            this.icon = icon;
+            this.exIcon = exIcon;
+            this.clickListener = onClickListener;
+        }
 
         public HomeListItemModel(int index, String title, String description, @DrawableRes int icon, View.OnClickListener onClickListener) {
             this.index = index;
@@ -67,6 +82,12 @@ public class HomeListAdapter extends RecyclerView.Adapter<HomeListAdapter.HomeIt
         homeItemHolder.tvTitle.setText(model.title);
         homeItemHolder.tvDescription.setText(model.desc);
         homeItemHolder.itemView.setOnClickListener(model.clickListener);
+        if (model.exIcon != 0) {
+            homeItemHolder.ivExIcon.setVisibility(View.VISIBLE);
+            homeItemHolder.ivExIcon.setImageResource(model.exIcon);
+        }else {
+            homeItemHolder.ivExIcon.setVisibility(View.GONE);
+        }
     }
 
     @Override

@@ -3,8 +3,7 @@
 本代码仓库集合了融云实时音视频产品[音视频通话]、[音视频会议]、[低延迟直播]在 Android 端的示例代码，以便开发者体验产品，快速集成[融云实时音视频 Android 端 SDK]，实现单群聊、音视频通话、语音聊天室、娱乐直播、教学课堂、多人会议等场景需求。
 
 <p align="center" style="background-color: #e1e5eb; padding: 10px; margin-top: 5px; margin-bottom:5px;">
-<img src="images/callapp-demo.png" width="20%">
-<img src="images/rtcapp-demo.png" width="20%">
+<img src="images/rtcapp-demo.png" width="40%">
 </p>
 
 如果想要直接下载 Android APK 体验各场景下应用功能，欢迎[前往融云官网下载各场景的示例应用](https://www.rongcloud.cn/downloads/demo)。
@@ -12,16 +11,16 @@
 本仓库包含两个示例应用项目: 
 
 1. [rtcapp](rtcapp): 集中演示融云实时音视频 Android SDK 支持的多个非呼叫业务场景与功能。
-1. [callapp](callapp): 演示融云实时音视频 Android SDK 支持的含呼叫业务音视频通话场景与功能。
 
 本仓库还包含多个组件: (module): 
 
 1. [common](common): 含 AppServer 示例、通用 UI 功能函数。AppServer 支持获取 Token。
-1. [meeting1v1](meeting1v1): 两人会议。
-1. [live](live): 直播。支持观众之间音视频互动。
-1. [screenshare](screenshare): 屏幕共享。
-1. [calllib](calllib): 不带 UI 的呼叫功能展示。
-1. [callkit](callkit): 带 UI 的呼叫功能展示。
+2. [meeting1v1](meeting1v1): 两人会议。
+3. [live](live): 直播。支持观众之间音视频互动。
+4. [screenshare](screenshare): 屏幕共享。
+5. [calllib](calllib): 不带 UI 的呼叫功能展示。
+6. [callkit](callkit): 带 UI 的呼叫功能展示。
+7. [callplus](callplus): 新一代音视频通话（呼叫）SDK功能展示。
 
 ## 前提条件
 
@@ -62,13 +61,13 @@
     public static final String APP_SECRET = "";
     ```
 
-1. 在 Android Studio 顶部选择 `callapp` 或 `rtcapp`，点击运行。
+1. 在 Android Studio 顶部选择 `rtcapp`，点击运行。
 
 ## 文档
 
-- [音视频通话文档]
-- [音视频会议文档]
-- [低延迟直播文档]
+- [音视频通话（CallLib/Kit）文档]
+- [音视频通话（CallPlus）文档]
+- [音视频直播/会议文档]
 
 ## 支持
 
@@ -90,11 +89,11 @@ Demo 源码遵循 MIT 开源协议。
 
 <!-- links to docs -->
 
-[音视频通话文档]: http://doc.rongcloud.cn/call/Android/5.X/demo
+[音视频通话（CallLib/Kit）文档]: https://doc.rongcloud.cn/call/Android/5.X/demo
 
-[音视频会议文档]: http://doc.rongcloud.cn/meeting/Android/5.X/demo
+[音视频通话（CallPlus）文档]: https://doc.rongcloud.cn/callplus/Android/1.X/make-first-call
 
-[低延迟直播文档]: http://doc.rongcloud.cn/live/Android/5.X/demo
+[音视频直播/会议文档]: https://doc.rongcloud.cn/rtc/Android/5.X/demo
 
 <!-- links to ops -->
 
