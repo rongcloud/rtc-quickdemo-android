@@ -8,9 +8,9 @@
 
 如果想要直接下载 Android APK 体验各场景下应用功能，欢迎[前往融云官网下载各场景的示例应用](https://www.rongcloud.cn/downloads/demo)。
 
-本仓库包含两个示例应用项目: 
+本仓库包含一个示例应用项目: 
 
-1. [rtcapp](rtcapp): 集中演示融云实时音视频 Android SDK 支持的多个非呼叫业务场景与功能。
+- [rtcapp](rtcapp): 集中演示融云实时音视频 Android SDK 支持的多个非呼叫业务场景与功能。
 
 本仓库还包含多个组件: (module): 
 
