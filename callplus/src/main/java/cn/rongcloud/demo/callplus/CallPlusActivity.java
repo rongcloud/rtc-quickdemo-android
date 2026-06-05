@@ -111,7 +111,7 @@ public class CallPlusActivity extends AppCompatActivity implements View.OnClickL
 
     private IRCCallPlusEventListener eventListener = new CallPlusEventListenerImpl() {
         @Override
-        public void onReceivedCall(RCCallPlusSession callSession) {
+        public void onReceivedCall(RCCallPlusSession callSession,String extra) {
             Log.d(TAG, "有人邀请你callId：" + callSession.getCallId());
             currentStatus = CallStatus.Idle;
             acceptCallId = callSession.getCallId();

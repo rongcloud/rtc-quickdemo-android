@@ -42,10 +42,12 @@ public class CallPlusEventListenerImpl implements IRCCallPlusEventListener {
      *
      * @param callSession 通话实体信息<br>
      */
+
     @Override
-    public void onReceivedCall(RCCallPlusSession callSession) {
+    public void onReceivedCall(RCCallPlusSession callSession, String extra) {
 
     }
+
     /**
      * 通话建立成功<br>
      *
